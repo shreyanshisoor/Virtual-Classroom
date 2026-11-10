@@ -1,0 +1,217 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Section {
+  id       Int      @id @default(autoincrement())
+  code     String   @unique
+  semester Int
+  branch   String
+
+  students Student[]
+  subjects Subject[]
+  attendanceSessions AttendanceSession[]
+}
+
+model Student {
+  id        Int      @id @default(autoincrement())
+  uid       String   @unique
+  name      String ?
+  password  String
+
+  section   Section?  @relation(fields: [sectionId], references: [id])
+  sectionId Int?
+
+  submissions QuizSubmission[]
+  attendanceRecords AttendanceRecord[]
+}
+
+model Faculty {
+  id       Int      @id @default(autoincrement())
+  uid      String   @unique
+   name     String?
+  password String
+
+  subjects Subject[]
+  attendanceSessions AttendanceSession[]
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String
+
+  section   Section  @relation(fields: [sectionId], references: [id])
+  sectionId Int
+
+  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  facultyId Int
+
+  timetables Timetable[]
+  liveClasses LiveClass[]
+  units Unit[]
+  attendanceSessions AttendanceSession[]
+}
+model Unit {
+  id        Int      @id @default(autoincrement())
+  title     String
+  order     Int
+
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId Int
+
+  chapters  Chapter[]
+  quizzes   Quiz[]
+}
+
+model Chapter {
+  id      Int     @id @default(autoincrement())
+  title   String
+  order   Int
+
+  unit    Unit    @relation(fields: [unitId], references: [id])
+  unitId  Int
+
+  materials StudyMaterial[]
+}
+
+model StudyMaterial {
+  id         Int      @id @default(autoincrement())
+  title      String
+  link       String
+  uploadedAt DateTime @default(now())
+
+  chapter    Chapter  @relation(fields: [chapterId], references: [id])
+  chapterId  Int
+}
+
+model Timetable {
+  id        Int      @id @default(autoincrement())
+  day       String
+  startTime String
+  endTime   String
+
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId Int
+}
+model LiveClass {
+  id        Int      @id @default(autoincrement())
+  topic     String
+  link      String
+  date      DateTime
+
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId Int
+}
+model Quiz {
+  id        Int      @id @default(autoincrement())
+  title     String
+  openDate  DateTime
+  closeDate DateTime
+  timeLimit Int      // in minutes
+  attempts  Int      // max attempts allowed
+
+  unit      Unit     @relation(fields: [unitId], references: [id])
+  unitId    Int
+
+  questions Question[]
+  submissions QuizSubmission[]
+}
+
+model Question {
+  id       Int    @id @default(autoincrement())
+  question String
+  optionA  String
+  optionB  String
+  optionC  String
+  optionD  String
+  correct  String   // "A" | "B" | "C" | "D"
+
+  quiz     Quiz @relation(fields: [quizId], references: [id])
+  quizId   Int
+}
+
+model QuizSubmission {
+  id        Int      @id @default(autoincrement())
+  score     Int
+  startedAt DateTime
+  completedAt DateTime
+
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId Int
+
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    Int
+}
+
+model Admin {
+  id       Int      @id @default(autoincrement())
+  uid      String   @unique
+  name     String?
+  password String
+}
+
+model AttendanceSession {
+  id          Int      @id @default(autoincrement())
+  lectureDate String
+  createdAt   DateTime @default(now())
+
+  course    Subject  @relation(fields: [courseId], references: [id])
+  courseId   Int
+
+  section   Section  @relation(fields: [sectionId], references: [id])
+  sectionId Int
+
+  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  facultyId Int
+
+  records   AttendanceRecord[]
+
+  @@unique([courseId, sectionId, lectureDate])
+}
+
+model AttendanceRecord {
+  id       Int    @id @default(autoincrement())
+  status   String // "present" | "absent"
+
+  session   AttendanceSession @relation(fields: [sessionId], references: [id])
+  sessionId Int
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+
+  @@unique([sessionId, studentId])
+}
+
+model Poll {
+  id         Int      @id @default(autoincrement())
+  title      String
+  quizId     Int
+  startedAt  DateTime?
+  endTime    DateTime?
+  isActive   Boolean   @default(false)
+  timeLimit  Int?     // in seconds
+
+  quiz       Quiz     @relation(fields: [quizId], references: [id])
+  pollAnswers PollAnswer[]
+  questions   Question[] @relation("QuizPollQuestions")
+}
+
+model PollAnswer {
+  id         Int      @id @default(autoincrement())
+  pollId     Int
+  studentId  Int
+  questionId Int
+  selectedOption String  // "A" | "B" | "C" | "D"
+  answeredAt  DateTime @default(now())
+
+  poll      Poll      @relation(fields: [pollId], references: [id])
+  student   Student   @relation(fields: [studentId], references: [id])
+  question  Question  @relation(fields: [questionId], references: [id])
+
+  @@unique([pollId, studentId, questionId])
+}

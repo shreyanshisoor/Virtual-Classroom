@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal — Virtual Classroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ================================================================
+       DESIGN SYSTEM — Virtual Classroom Student Portal
+       Production-grade SaaS layout with sidebar + dark mode
+    ================================================================ */
+        :root {
+            /* Brand */
+            --accent: #4f6fff;
+            --accent-dim: #3550dd;
+            --accent-light: #7094ff;
+            --accent-glow: rgba(79, 111, 255, 0.20);
+            --accent-subtle: rgba(79, 111, 255, 0.08);
+            /* Semantic */
+            --success: #16a34a;
+            --success-bg: rgba(22, 163, 74, 0.10);
+            --warning: #d97706;
+            --warning-bg: rgba(217, 119, 6, 0.10);
+            --danger: #dc2626;
+            --danger-bg: rgba(220, 38, 38, 0.10);
+            /* Surfaces */
+            --bg: #f0f2f8;
+            --bg-subtle: #e8eaef;
+            --bg-inset: #eceef4;
+            --card: #ffffff;
+            --card-hover: #f8f9ff;
+            --sidebar-bg: #0d1424;
+            --sidebar-border: rgba(255, 255, 255, 0.07);
+            --sidebar-text: rgba(175, 200, 255, 0.62);
+            --sidebar-active: rgba(79, 111, 255, 0.14);
+            --sidebar-active-text: #7094ff;
+            /* Borders */
+            --border: rgba(10, 20, 60, 0.07);
+            --border-mid: rgba(10, 20, 60, 0.11);
+            /* Text */
+            --text: #0d1424;
+            --subtext: #4b5775;
+            --text-muted: #8f9dbb;
+            --text-xmuted: #b8c4d8;
+            /* Shadows */
+            --shadow-xs: 0 1px 2px rgba(10, 20, 60, 0.05);
+            --shadow-sm: 0 1px 3px rgba(10, 20, 60, 0.06), 0 1px 2px rgba(10, 20, 60, 0.04);
+            --shadow-md: 0 4px 12px rgba(10, 20, 60, 0.07), 0 1px 3px rgba(10, 20, 60, 0.05);
+            --shadow-lg: 0 10px 32px rgba(10, 20, 60, 0.10), 0 2px 6px rgba(10, 20, 60, 0.06);
+            /* Layout */
+            --sidebar-width: 230px;
+            --header-h: 58px;
+            /* Radii */
+            --radius-card: 13px;
+            --radius-sm: 8px;
+            --radius-btn: 8px;
+            --radius-pill: 99px;
+            /* Motion */
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+            --dur-fast: 0.15s;
+            --dur-base: 0.22s;
+        }
+
+        /* ── Dark mode overrides ── */
+        body.dark {
+            --bg: #080f1c;
+            --bg-subtle: #0e1828;
+            --bg-inset: #0c1526;
+            --card: #111e30;
+            --card-hover: #142336;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-mid: rgba(255, 255, 255, 0.11);
+            --text: #dceaff;
+            --subtext: #6d88ab;
+            --text-muted: #4e6480;
+            --text-xmuted: #344d66;
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.40), 0 1px 4px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 10px 36px rgba(0, 0, 0, 0.50), 0 2px 8px rgba(0, 0, 0, 0.30);
+        }
+
+        /* ── Reset ── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            transition: background var(--dur-base), color var(--dur-base);
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccd4e2;
+            border-radius: 99px;
+        }
+
+        body.dark ::-webkit-scrollbar-thumb {
+            background: #1e3048;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8b4cc;
+        }
+
+        /* ================================================================
+       SIDEBAR
+    ================================================================ */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 200;
+            transition: transform var(--dur-base) var(--ease-out);
+        }
+
+        .sidebar-brand {
+            padding: 20px 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .sidebar-brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-brand-text strong {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-brand-text span {
+            font-size: 11px;
+            color: var(--sidebar-text);
+            font-weight: 500;
+            margin-top: 1px;
+        }
+
+        .sidebar-nav {
+            padding: 14px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sidebar-section-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 16px 8px 6px;
+        }
+
+        .sidebar-section-label:first-child {
+            padding-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--sidebar-text);
+            transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+            user-select: none;
+            text-decoration: none;
+        }
+
+        .nav-item .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(220, 235, 255, 0.9);
+        }
+
+        .nav-item:hover .nav-icon {
+            opacity: 1;
+        }
+
+        .nav-item.active {
+            background: var(--sidebar-active);
+            color: var(--sidebar-active-text);
+        }
+
+        .nav-item.active .nav-icon {
+            opacity: 1;
+        }
+
+        .sidebar-footer {
+            padding: 14px 12px;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--sidebar-border);
+        }
+
+        .sidebar-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar-user-info .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(220, 235, 255, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-user-info .role-label {
+            font-size: 11px;
+            color: var(--sidebar-text);
+            margin-top: 1px;
+        }
+
+        .logout-btn-sidebar {
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: color var(--dur-fast) ease, background var(--dur-fast) ease;
+        }
+
+        .logout-btn-sidebar:hover {
+            color: rgba(255, 100, 100, 0.85);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        /* ================================================================
+       MAIN AREA
+    ================================================================ */
+        .main-wrap {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            height: var(--header-h);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-xs);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background var(--dur-base), border-color var(--dur-base);
+        }
+
+        body.dark .topbar {
+            background: rgba(8, 15, 28, 0.92);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            color: var(--text);
+        }
+
+        .topbar-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-mid);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text);
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            transition: background var(--dur-fast) ease;
+        }
+
+        .hamburger::after {
+            display: none !important;
+        }
+
+        .hamburger:hover {
+            background: var(--bg-subtle);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .hamburger:active {
+            transform: none;
+        }
+
+        /* Dark mode pill toggle in topbar */
+        .btn-theme {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            border: 1.5px solid var(--border-mid);
+            background: transparent;
+            color: var(--text);
+            font-size: 12.5px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            margin: 0;
+            box-shadow: none;
+            letter-spacing: 0.1px;
+            transition:
+                border-color var(--dur-fast) ease,
+                background var(--dur-fast) ease,
+                color var(--dur-fast) ease;
+        }
+
+        .btn-theme::after {
+            display: none;
+        }
+
+        .btn-theme:hover {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-theme:active {
+            transform: none;
+        }
+
+        /* Logout */
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: var(--radius-btn);
+            background: rgba(220, 38, 38, 0.07);
+            color: var(--danger);
+            border: 1px solid rgba(220, 38, 38, 0.16);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0;
+            box-shadow: none;
+            transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
+        }
+
+        .btn-logout::after {
+            display: none;
+        }
+
+        .btn-logout:hover {
+            background: rgba(220, 38, 38, 0.12);
+            border-color: rgba(220, 38, 38, 0.28);
+            transform: none;
+        }
+
+        .btn-logout:active {
+            transform: scale(0.98);
+        }
+
+        /* ── Page content ── */
+        .page-content {
+            flex: 1;
+            padding: 36px 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .section {
+            animation: section-in 0.24s var(--ease-out) both;
+        }
+
+        .section.hidden {
+            display: none;
+        }
+
+        @keyframes section-in {
+            from {
+                opacity: 0;
+                transform: translateY(9px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* ── Section heading ── */
+        .section-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            color: var(--text);
+        }
+
+        .section-heading p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card .stat-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-xmuted);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        /* ── Hero card ── */
+        .hero {
+            position: relative;
+            background: linear-gradient(135deg, #5b7fff 0%, #3550dd 55%, #1e3a8a 100%);
+            border: none;
+            color: #fff;
+            padding: 32px 28px;
+            border-radius: var(--radius-card);
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(79, 111, 255, 0.35);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 2px;
+            background: linear-gradient(90deg, #7eb3ff, #c4d9ff, #7eb3ff);
+            background-size: 200% 100%;
+            animation: shimmer 3.5s linear infinite;
+        }
+
+        /* Decorative orb */
+        .hero::after {
+            content: '';
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 100% 0;
+            }
+
+            100% {
+                background-position: -100% 0;
+            }
+        }
+
+        .hero h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+            margin-bottom: 5px;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 13.5px;
+        }
+
+        .hero:hover {
+            transform: none;
+        }
+
+        /* ── Regular cards ── */
+        .card {
+            background: var(--card);
+            padding: 20px 22px;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 12px;
+            transition:
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) ease,
+                background var(--dur-fast) ease,
+                border-color var(--dur-fast) ease;
+        }
+
+        .card:hover {
+            background: var(--card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.25px;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .card h4 {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .card p {
+            font-size: 13.5px;
+            color: var(--subtext);
+            margin-top: 2px;
+        }
+
+        /* ── Subjects grid ── */
+        .subjects {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        /* ── Live class card ── */
+        .live-class-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .live-class-row .meta {
+            flex: 1;
+        }
+
+        .live-class-row .meta .lc-subject {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .live-class-row .meta .lc-topic {
+            font-size: 13px;
+            color: var(--subtext);
+        }
+
+        /* ── Status badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .badge.live {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid rgba(220, 38, 38, 0.20);
+        }
+
+        .badge.live::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+
+        .badge.soon {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid rgba(217, 119, 6, 0.18);
+        }
+
+        .badge.scheduled {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid rgba(79, 111, 255, 0.18);
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.45;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ── Timetable row ── */
+        .timetable-row {
+            padding: 10px 14px;
+            border-left: 3px solid var(--accent);
+            background: var(--bg-inset);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13.5px;
+        }
+
+        .timetable-row .tt-subject {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .timetable-row .tt-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ── Collapsible tree ── */
+        .unit-title {
+            font-weight: 600;
+            font-size: 13.5px;
+            margin-top: 10px;
+            cursor: pointer;
+            padding: 8px 11px;
+            background: var(--bg-inset);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            color: var(--subtext);
+        }
+
+        .unit-title:hover {
+            background: var(--accent-subtle);
+            border-color: rgba(79, 111, 255, 0.18);
+            color: var(--accent);
+        }
+
+        body.dark .unit-title {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        body.dark .unit-title:hover {
+            background: rgba(79, 111, 255, 0.12);
+        }
+
+        .unit-content {
+            display: none;
+            border-left: 2px solid var(--border-mid);
+            padding-left: 14px;
+            margin-left: 12px;
+            margin-top: 2px;
+        }
+
+        .chapter-title {
+            margin-top: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            padding: 5px 8px;
+            border-radius: 6px;
+            transition: background var(--dur-fast) ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .chapter-title:hover {
+            background: var(--accent-subtle);
+        }
+
+        .chapter-content {
+            margin-left: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .chapter-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .chapter-content li {
+            padding: 6px 2px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .chapter-content li:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-content a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color var(--dur-fast) ease;
+        }
+
+        .chapter-content a::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: currentColor;
+            transition: width var(--dur-base) var(--ease-out);
+        }
+
+        .chapter-content a:hover {
+            color: var(--accent-dim);
+        }
+
+        .chapter-content a:hover::after {
+            width: 100%;
+        }
+
+        /* ── Buttons ── */
+        button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            overflow: hidden;
+            margin-top: 14px;
+            padding: 9px 20px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-btn);
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.1px;
+            box-shadow: 0 2px 10px var(--accent-glow);
+            transition:
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) ease,
+                filter var(--dur-fast) ease;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, 0.18) 50%, transparent 62%);
+            transform: translateX(-100%);
+            transition: transform 0.45s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+            box-shadow: 0 4px 22px rgba(79, 111, 255, 0.42);
+        }
+
+        button:hover::after {
+            transform: translateX(100%);
+        }
+
+        button:active {
+            transform: translateY(0) scale(0.975);
+            transition-duration: 0.08s;
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ── Skeleton loader ── */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--bg-inset) 50%, var(--bg-subtle) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-wave 1.4s ease-in-out infinite;
+            border-radius: 6px;
+        }
+
+        @keyframes skeleton-wave {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 20px 22px;
+            margin-bottom: 12px;
+        }
+
+        .sk-line {
+            height: 13px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .sk-line.w-60 {
+            width: 60%;
+        }
+
+        .sk-line.w-80 {
+            width: 80%;
+        }
+
+        .sk-line.w-40 {
+            width: 40%;
+        }
+
+        .sk-line.w-100 {
+            width: 100%;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 36px;
+            margin-bottom: 14px;
+            opacity: 0.45;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-sub {
+            font-size: 12.5px;
+            color: var(--text-xmuted);
+            margin-top: 4px;
+        }
+
+        /* ── WebSocket Reconnection Banner ── */
+        #ws-reconnect-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--accent-warning);
+            color: #1e1e1e;
+            padding: 16px;
+            text-align: center;
+            z-index: 9998;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            animation: bannerSlideIn 0.3s ease-out;
+        }
+
+        #ws-reconnect-banner.show {
+            display: flex;
+        }
+
+        @keyframes bannerSlideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ================================================================
+       TOAST SYSTEM
+    ================================================================ */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 11px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.20);
+            pointer-events: auto;
+            animation: toast-in 0.28s var(--ease-out) both;
+            max-width: 320px;
+        }
+
+        .toast.success {
+            background: rgba(22, 163, 74, 0.95);
+        }
+
+        .toast.error {
+            background: rgba(220, 38, 38, 0.95);
+        }
+
+        .toast.info {
+            background: rgba(79, 111, 255, 0.95);
+        }
+
+        .toast.fade-out {
+            animation: toast-out 0.28s ease forwards;
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+        }
+
+        /* ================================================================
+       SIDEBAR OVERLAY (mobile)
+    ================================================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 190;
+            backdrop-filter: blur(2px);
+        }
+
+        /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(calc(-1 * var(--sidebar-width)));
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                display: block;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity var(--dur-base) ease;
+            }
+
+            .sidebar-overlay.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .main-wrap {
+                margin-left: 0;
+            }
+
+            .hamburger {
+                display: inline-flex;
+            }
+
+            .page-content {
+                padding: 24px 18px;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .subjects {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ── Icon system ── */
+        .app-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: -4px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .logo svg,
+        .sidebar-avatar svg {
+            display: block;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ================================================================
+       STUDENT ATTENDANCE TABLE
+    ================================================================ */
+        .att-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        .att-table th {
+            background: var(--bg-subtle);
+            padding: 11px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-muted);
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .att-table td {
+            padding: 12px 14px;
+            font-size: 13.5px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .att-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .att-table tbody tr:hover {
+            background: var(--card-hover, rgba(0, 0, 0, 0.02));
+        }
+
+        .att-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-inset);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .att-progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.4s var(--ease-out);
+        }
+
+        .att-pct {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .att-pct.good {
+            color: #16a34a;
+        }
+
+        .att-pct.warn {
+            color: #d97706;
+        }
+
+        .att-pct.bad {
+            color: #dc2626;
+        }
+
+        /* ================================================================
+       AI STUDY BUDDY — Chat Sidebar
+    ================================================================ */
+        .ai-buddy-sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 340px;
+            min-height: 100vh;
+            background: var(--card);
+            border-left: 1px solid var(--border);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+            transform: translateX(0);
+            transition: transform var(--dur-base) var(--ease-out);
+        }
+
+        .ai-buddy-sidebar.collapsed {
+            transform: translateX(100%);
+        }
+
+        .ai-buddy-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--accent-subtle);
+        }
+
+        .ai-buddy-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .ai-buddy-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ai-buddy-collapse {
+            background: none;
+            border: none;
+            color: var(--text-xmuted);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+        }
+
+        .ai-buddy-collapse:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--accent);
+        }
+
+        .ai-buddy-context {
+            padding: 12px 20px;
+            background: var(--bg-inset);
+            font-size: 13px;
+            color: var(--subtext);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ai-buddy-context strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .ai-buddy-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ai-action-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background var(--dur-fast) ease, transform var(--dur-fast) ease;
+        }
+
+        .ai-action-chip:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .ai-buddy-messages {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-buddy-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .ai-buddy-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ai-buddy-messages::-webkit-scrollbar-thumb {
+            background: var(--border-mid);
+            border-radius: 99px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-bubble.student {
+            background: var(--accent);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message-bubble.ai {
+            background: var(--bg-subtle);
+            color: var(--text);
+            align-self: flex-start;
+            border: 1px solid var(--border);
+        }
+
+        .message-bubble.ai .strong {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--bg-subtle);
+            border-radius: 14px;
+            align-self: flex-start;
+            border: 1px solid var(--border);
+        }
+
+        .typing-indicator .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-xmuted);
+            animation: pulse-dot 1.2s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        .typing-indicator .dot:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .typing-indicator .dot:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .ai-buddy-input {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .ai-buddy-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            background: var(--card);
+            color: var(--text);
+            outline: none;
+            transition: border-color var(--dur-fast) ease;
+        }
+
+        .ai-buddy-input input:focus {
+            border-color: var(--accent);
+        }
+
+        .ai-buddy-input input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .ai-buddy-send {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 0 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+        }
+
+        .ai-buddy-send:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(79, 111, 255, 0.3);
+        }
+
+        .ai-buddy-send:active {
+            transform: translateY(0);
+        }
+
+        /* Collapse toggle button in main area */
+        .ai-toggle-btn {
+            position: fixed;
+            right: 12px;
+            bottom: 12px;
+            z-index: 998;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(79, 111, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform var(--dur-fast) ease;
+        }
+
+        .ai-toggle-btn:hover {
+            transform: scale(1.08);
+        }
+
+        body.dark .ai-buddy-sidebar {
+            background: #111e30;
+        }
+
+        body.dark .ai-buddy-actions {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 900px) {
+            .ai-buddy-sidebar {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ================================================================
+       SIDEBAR
+  ================================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg></div>
+            <div class="sidebar-brand-text">
+                <strong>Virtual Classroom</strong>
+                <span>Student Portal</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Overview</div>
+            <a class="nav-item active" onclick="showSection('home')" href="#">
+                <span class="nav-icon"><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg></span> Home
+            </a>
+            <a class="nav-item" onclick="showSection('dashboard')" href="#">
+                <span class="nav-icon"><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                    </svg></span> My Subjects
+            </a>
+
+            <div class="sidebar-section-label">Academics</div>
+            <a class="nav-item" onclick="showSection('material')" href="#">
+                <span class="nav-icon"><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg></span> Study Material
+            </a>
+
+            <div class="sidebar-section-label">Records</div>
+            <a class="nav-item" onclick="showSection('attendance')" href="#">
+                <span class="nav-icon"><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <rect x="8" y="2" width="8" height="4" rx="1" />
+                        <path d="M9 14l2 2 4-4" />
+                    </svg></span> Attendance
+            </a>
+            <a class="nav-item" onclick="showSection('quiz')" href="#">
+                <span class="nav-icon" style="font-size:16px;">📝</span> Quizzes
+            </a>
+            <a class="nav-item" onclick="showSection('code')" href="code-editor.html">
+                <span class="nav-icon" style="font-size: 16px;">💻</span> Code Editor
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg></div>
+                <div class="sidebar-user-info">
+                    <div class="name" id="sidebarStudentName">Student</div>
+                    <div class="role-label" id="sidebarSectionLabel">Section —</div>
+                </div>
+                <button class="logout-btn-sidebar" onclick="doLogout()" title="Logout"><svg class="app-icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================================================================
+       MAIN CONTENT
+  ================================================================ -->
+    <div class="main-wrap">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" onclick="toggleSidebar()"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg></button>
+                <div>
+                    <div class="topbar-title" id="pageTitle">Home</div>
+                    <div class="topbar-subtitle" id="pageSubtitle">Your overview</div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <!-- Original class "toggle" and onclick="toggleMode()" preserved for JS -->
+                <button class="btn-theme toggle" onclick="toggleMode()" id="themeToggleBtn"><svg class="app-icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg> Dark</button>
+                <button class="btn-logout" onclick="doLogout()"><svg class="app-icon" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg> Logout</button>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="page-content">
+
+            <!-- ── HOME SECTION ── (id="homeSection" preserved for JS) -->
+            <div id="homeSection" class="section">
+
+                <!-- Hero welcome card -->
+                <div class="hero">
+                    <h2>Welcome Back</h2>
+                    <p id="welcomeText"></p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">Subjects</div>
+                        <div class="stat-value" id="statSubjects">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Live Classes</div>
+                        <div class="stat-value" id="statLive">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Assessments</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Attendance</div>
+                        <div class="stat-value">--%</div>
+                    </div>
+                </div>
+
+                <!-- Today's classes -->
+                <div class="card">
+                    <h3>📅 Today's Timetable</h3>
+                    <div id="todayClasses" style="margin-top: 12px;"></div>
+                </div>
+
+                <!-- Live classes -->
+                <div class="card">
+                    <h3><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                            <line x1="12" y1="20" x2="12.01" y2="20" />
+                        </svg>Upcoming Live Classes</h3>
+                    <div id="homeLiveClasses" style="margin-top: 12px;"></div>
+                </div>
+
+            </div>
+
+            <!-- ── DASHBOARD / MY SUBJECTS (id="dashboardSection" preserved for JS) ── -->
+            <div id="dashboardSection" class="section hidden">
+                <div class="section-heading">
+                    <div>
+                        <h2>Your Subjects</h2>
+                        <p>All subjects for your section</p>
+                    </div>
+                </div>
+                <!-- original id="dashboardSubjects" preserved -->
+                <div class="subjects" id="dashboardSubjects"></div>
+            </div>
+
+            <!-- ── STUDY MATERIAL (id="materialSection" preserved for JS) ── -->
+            <div id="materialSection" class="section hidden">
+                <div class="section-heading">
+                    <div>
+                        <h2>Study Material</h2>
+                        <p>Browse materials by subject, unit, and chapter</p>
+                    </div>
+                </div>
+                <!-- original id="materialSubjects" preserved -->
+                <div id="materialSubjects"></div>
+            </div>
+
+            <!-- ── QUIZ SECTION (new section) ── -->
+            <div id="quizSection" class="section hidden">
+                <div class="section-heading">
+                    <div>
+                        <h2>Available Quizzes</h2>
+                        <p>Select a quiz to begin</p>
+                    </div>
+                </div>
+                <div id="quizList" class="subjects"></div>
+            </div>
+
+            <!-- ── LIVE POLL MODAL ── -->
+            <div id="pollModal" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:500; align-items:center; justify-content:center;">
+                <div class="modal-content" style="background:var(--card); border-radius:16px; max-width:500px; width:90%; padding:24px; box-shadow:var(--shadow-lg);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 id="modalQuizTitle" style="margin:0; font-size:18px;">Live Poll</h3>
+                        <button id="closePollBtn" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">×</button>
+                    </div>
+                    <div id="pollQuestion" style="margin-bottom:24px;"></div>
+                    <div id="pollOptions"></div>
+                    <div id="pollTimer" style="margin-top:20px; text-align:center; font-size:24px; font-weight:600; color:var(--accent);"></div>
+                    <button id="submitPollBtn" style="margin-top:20px; width:100%; display:none;">Submit All Answers</button>
+                </div>
+            </div>
+
+            <!-- ── POLL RESULTS MODAL ── -->
+            <div id="pollResultsModal" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:500; align-items:center; justify-content:center;">
+                <div class="modal-content" style="background:var(--card); border-radius:16px; max-width:600px; width:90%; padding:24px; box-shadow:var(--shadow-lg);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 id="resultsQuizTitle" style="margin:0; font-size:18px;">Poll Results</h3>
+                        <button id="closeResultsBtn" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">×</button>
+                    </div>
+                    <div id="pollResultsContent"></div>
+                </div>
+            </div>
+
+            <!-- ── ATTENDANCE (new section) ── -->
+            <div id="attendanceSection" class="section hidden">
+                <div class="section-heading">
+                    <div>
+                        <h2>My Attendance</h2>
+                        <p>Your attendance summary across all courses</p>
+                    </div>
+                </div>
+
+                <!-- Overall stat -->
+                <div class="stats-row" style="margin-bottom:24px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Overall Attendance</div>
+                        <div class="stat-value" id="attOverallPct">--%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Lectures</div>
+                        <div class="stat-value" id="attTotalLectures">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Present</div>
+                        <div class="stat-value" id="attTotalPresent" style="color:#16a34a;">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Absent</div>
+                        <div class="stat-value" id="attTotalAbsent" style="color:#dc2626;">0</div>
+                    </div>
+                </div>
+
+                <!-- Per-course breakdown -->
+                <div class="card" style="overflow-x:auto;">
+                    <h3>Course-wise Breakdown</h3>
+                    <table class="att-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Faculty</th>
+                                <th>Lectures</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attCourseTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- AI Study Buddy Sidebar -->
+    <aside class="ai-buddy-sidebar" id="aiBuddySidebar">
+        <div class="ai-buddy-header">
+            <div class="ai-buddy-title">
+                <div class="ai-buddy-icon">💬</div>
+                <span>AI Study Buddy</span>
+            </div>
+            <button class="ai-buddy-collapse" id="aiBuddyCollapse" onclick="collapseAIBuddy()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="ai-buddy-context" id="aiBuddyContext">
+            <strong>Current Topic:</strong> <span id="currentTopic">Loading...</span>
+        </div>
+
+        <div class="ai-buddy-actions" id="aiBuddyActions">
+            <div class="ai-action-chip" onclick="sendMessageWithAction('summarize')">📝 Summarize</div>
+            <div class="ai-action-chip" onclick="sendMessageWithAction('explain')">🔢 Explain</div>
+            <div class="ai-action-chip" onclick="sendMessageWithAction('quiz')">❓ Quiz</div>
+        </div>
+
+        <div class="ai-buddy-messages" id="aiBuddyMessages">
+            <div class="message-bubble ai">
+                Hi there! I'm your AI Study Buddy. I'm here to help with questions about your current topic, explain concepts, or quiz you on the material. What would you like to discuss?
+            </div>
+        </div>
+
+        <div class="ai-buddy-input">
+            <input type="text" id="aiBuddyInput" placeholder="Ask me anything about your studies..." onkeyup="handleAIBuddyKey(event)">
+            <button class="ai-buddy-send" onclick="sendMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- AI Buddy Toggle Button -->
+    <button class="ai-toggle-btn" id="aiToggleBtn" onclick="toggleAIBuddy()">
+        💬
+    </button>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <!-- WebSocket Reconnection Banner -->
+    <div id="ws-reconnect-banner" style="display: none; position: fixed; top: 0; left: 0; right: 0; background: var(--accent-warning); color: #1e1e1e; padding: 16px; text-align: center; z-index: 9998; gap: 12px; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+        <span style="font-weight: 500;">WebSocket connection lost. Attempting to reconnect...</span>
+        <span id="ws-reconnect-count" style="background: rgba(0,0,0,0.1); padding: 4px 12px; border-radius: 20px; font-size: 13px;"></span>
+    </div>
+
+    <!-- ================================================================
+       SCRIPTS
+    ================================================================ -->
+    <script>
+        /* ── Toast helper ── */
+        function showToast(msg, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✓', error: '✕', info: 'ℹ' };
+            toast.innerHTML = `<span>${icons[type] || '●'}</span><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        /* ── Sidebar helpers ── */
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        /* Active nav sync */
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+                closeSidebar();
+            });
+        });
+
+        /* ── Logout helper (new name to avoid clash) ── */
+        function doLogout() {
+            localStorage.clear();
+            window.location.href = 'idx1.html';
+        }
+
+        /* ================================================================
+           ORIGINAL APPLICATION LOGIC — preserved exactly as written
+           (all IDs, function names, fetch calls unchanged)
+        ================================================================ */
+        const uid = localStorage.getItem('uid');
+        if (!uid) window.location.href = 'idx1.html';
+
+        /* toggleMode — original function preserved for .toggle onclick */
+        function toggleMode() {
+            document.body.classList.toggle('dark');
+            const btn = document.getElementById('themeToggleBtn');
+            const moonSVG = '<svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+            const sunSVG = '<svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+            if (document.body.classList.contains('dark')) {
+                btn.innerHTML = sunSVG + ' Light';
+            } else {
+                btn.innerHTML = moonSVG + ' Dark';
+            }
+        }
+
+        /* showSection — original function preserved for sidebar onclick calls */
+        function showSection(section) {
+            // Handle code editor separately (opens in new page)
+            if (section === 'code') {
+                window.location.href = 'code-editor.html';
+                return;
+            }
+
+            document.getElementById('homeSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('materialSection').style.display = 'none';
+            document.getElementById('attendanceSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'none';
+
+            const pageMeta = {
+                home: ['Home', 'Your overview at a glance'],
+                dashboard: ['My Subjects', 'All subjects for your section'],
+                material: ['Study Material', 'Browse resources by subject'],
+                attendance: ['Attendance', 'Your attendance summary'],
+                quiz: ['Available Quizzes', 'Select a quiz to begin'],
+                code: ['Code Editor', 'Collaborative coding workspace']
+            };
+
+            if (section === 'home') {
+                document.getElementById('homeSection').style.display = 'block';
+            }
+            if (section === 'dashboard') {
+                document.getElementById('dashboardSection').style.display = 'block';
+            }
+            if (section === 'material') {
+                document.getElementById('materialSection').style.display = 'block';
+            }
+            if (section === 'attendance') {
+                document.getElementById('attendanceSection').style.display = 'block';
+                loadStudentAttendance();
+            }
+            if (section === 'quiz') {
+                document.getElementById('quizSection').style.display = 'block';
+                loadAvailableQuizzes();
+            }
+
+            if (pageMeta[section]) {
+                document.getElementById('pageTitle').textContent = pageMeta[section][0];
+                document.getElementById('pageSubtitle').textContent = pageMeta[section][1];
+            }
+        }
+
+        /* toggleUnit — original preserved */
+        function toggleUnit(e) {
+            const content = e.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+
+        /* toggleChapter — original preserved */
+        function toggleChapter(e) {
+            const content = e.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+
+        /* loadDashboard — original logic, enhanced with skeleton + toasts */
+        async function loadDashboard() {
+            // Skeleton loaders
+            document.getElementById('homeLiveClasses').innerHTML = `
+        <div class="skeleton-card"><div class="sk-line w-60 skeleton"></div><div class="sk-line w-40 skeleton"></div></div>
+        <div class="skeleton-card"><div class="sk-line w-80 skeleton"></div><div class="sk-line w-40 skeleton"></div></div>`;
+
+            try {
+                const res = await fetch(`/student/dashboard/${uid}`);
+                const data = await res.json();
+
+                /* ── Welcome text & sidebar ── */
+                document.getElementById('sidebarStudentName').textContent = data.name || data.uid;
+                document.getElementById('pageSubtitle').textContent = `Hello, ${data.name || data.uid}`;
+
+                // Guard: student not yet assigned to a section
+                if (!data.section) {
+                    document.getElementById('welcomeText').innerText =
+                        `Hello ${data.name || data.uid} — you are not assigned to a section yet.`;
+                    document.getElementById('homeLiveClasses').innerHTML = '';
+                    document.getElementById('todayClasses').innerHTML = '';
+                    showToast('You are not assigned to a section yet. Please contact your administrator.', 'info', 6000);
+                    return;
+                }
+
+                document.getElementById('welcomeText').innerText =
+                    `Hello ${data.name || data.uid} • Section ${data.section.code}`;
+                document.getElementById('sidebarSectionLabel').textContent = `Section ${data.section.code}`;
+
+                /* ── Stats ── */
+                document.getElementById('statSubjects').innerText = data.section.subjects.length;
+
+                let totalLive = 0;
+                data.section.subjects.forEach(s => totalLive += s.liveClasses.length);
+                document.getElementById('statLive').innerText = totalLive;
+
+                /* ── Today's timetable ── */
+                const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+                const todayEl = document.getElementById('todayClasses');
+                todayEl.innerHTML = '';
+                let hasTimetable = false;
+
+                data.section.subjects.forEach(s => {
+                    s.timetables.forEach(t => {
+                        if (t.day === today) {
+                            hasTimetable = true;
+                            todayEl.innerHTML += `
+                <div class="timetable-row">
+                  <span class="tt-subject">${s.name}</span>
+                  <span class="tt-time">${t.startTime} – ${t.endTime}</span>
+                </div>`;
+                        }
+                    });
+                });
+
+                if (!hasTimetable) {
+                    todayEl.innerHTML = `
+            <div class="empty-state" style="padding: 24px;">
+              <div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <p>No classes today</p>
+            </div>`;
+                }
+
+                /* ── Live classes (original logic preserved; status styling enhanced) ── */
+                const liveContainer = document.getElementById('homeLiveClasses');
+                liveContainer.innerHTML = '';
+                const now = new Date();
+
+                data.section.subjects.forEach(subject => {
+                    subject.liveClasses.forEach(lc => {
+                        const classTime = new Date(lc.date);
+                        const diffMinutes = Math.floor((classTime - now) / 60000);
+
+                        let badgeHTML = '';
+                        if (diffMinutes <= 0 && diffMinutes >= -60) {
+                            badgeHTML = `<span class="badge live">Live Now</span>`;
+                        } else if (diffMinutes > 0 && diffMinutes <= 60) {
+                            badgeHTML = `<span class="badge soon">Starts in ${diffMinutes} min</span>`;
+                        } else if (diffMinutes > 60) {
+                            badgeHTML = `<span class="badge scheduled">${classTime.toLocaleString()}</span>`;
+                        }
+
+                        liveContainer.innerHTML += `
+              <div class="card" style="margin-bottom: 10px;">
+                <div class="live-class-row">
+                  <div class="meta">
+                    <div class="lc-subject">${subject.name}</div>
+                    <div class="lc-topic">${lc.topic}</div>
+                    <div style="margin-top: 8px;">${badgeHTML}</div>
+                  </div>
+                  <div>
+                    <a href="${lc.link}" target="_blank">
+                      <button style="margin-top:0; padding: 8px 16px; font-size: 13px;">
+                        Join →
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </div>`;
+                    });
+                });
+
+                if (liveContainer.innerHTML === '') {
+                    liveContainer.innerHTML = `
+            <div class="empty-state" style="padding: 24px 0;">
+              <div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
+              <p>No upcoming live classes</p>
+            </div>`;
+                }
+
+                /* ── Dashboard subjects (original id preserved) ── */
+                const dashboardDiv = document.getElementById('dashboardSubjects');
+                const materialDiv = document.getElementById('materialSubjects');
+                dashboardDiv.innerHTML = '';
+                materialDiv.innerHTML = '';
+
+                data.section.subjects.forEach(subject => {
+                    dashboardDiv.innerHTML += `
+            <div class="card">
+              <h3>${subject.name}</h3>
+              <p>Faculty: ${subject.faculty.name || subject.faculty.uid}</p>
+            </div>`;
+
+                    let unitHTML = '';
+                    subject.units.forEach(unit => {
+                        let chapterHTML = '';
+                        unit.chapters.forEach(chapter => {
+                            let materialHTML = '';
+                            if (chapter.materials.length > 0) {
+                                materialHTML = `<ul>${chapter.materials.map(m =>
+                                    `<li><a href="${m.link}" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${m.title}</a></li>`
+                                ).join('')}</ul>`;
+                            } else {
+                                materialHTML = `<p style="color: var(--text-muted); font-size: 12.5px; padding: 4px 0;">No materials yet</p>`;
+                            }
+
+                            chapterHTML += `
+                <div>
+                  <div class="chapter-title" onclick="toggleChapter(this)">▶ ${chapter.title}</div>
+                  <div class="chapter-content">${materialHTML}</div>
+                </div>`;
+                        });
+
+                        unitHTML += `
+              <div>
+                <div class="unit-title" onclick="toggleUnit(this)">▼ ${unit.title}</div>
+                <div class="unit-content">${chapterHTML}</div>
+              </div>`;
+                    });
+
+                    materialDiv.innerHTML += `
+            <div class="card">
+              <h3>${subject.name}</h3>
+              <div style="margin-top: 10px;">${unitHTML}</div>
+            </div>`;
+                });
+
+                if (data.section.subjects.length === 0) {
+                    dashboardDiv.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <p>No subjects found</p>
+              <div class="empty-sub">Contact your faculty or administrator</div>
+            </div>`;
+                }
+
+            } catch (err) {
+                showToast('Could not load dashboard data. Is the server running?', 'error', 5000);
+            }
+        }
+
+        loadDashboard();
+        showSection('home');
+
+        /* ================================================================
+           STUDENT ATTENDANCE
+        ================================================================ */
+        async function loadStudentAttendance() {
+            const tbody = document.getElementById('attCourseTable');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;"><div class="sk-line w-60 skeleton" style="margin: 0 auto 8px;"></div><div class="sk-line w-40 skeleton" style="margin:0 auto;"></div></td></tr>';
+
+            try {
+                const res = await fetch(`/student/attendance/${uid}`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                let totalLectures = 0, totalPresent = 0, totalAbsent = 0;
+
+                tbody.innerHTML = '';
+
+                if (data.courses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">No attendance records yet</td></tr>';
+                    return;
+                }
+
+                data.courses.forEach(c => {
+                    totalLectures += c.totalLectures;
+                    totalPresent += c.present;
+                    totalAbsent += c.absent;
+
+                    let pctClass = 'good';
+                    let barColor = '#16a34a';
+                    if (c.percentage < 75) { pctClass = 'warn'; barColor = '#d97706'; }
+                    if (c.percentage < 50) { pctClass = 'bad'; barColor = '#dc2626'; }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${c.courseName}</strong></td>
+                            <td>${c.faculty}</td>
+                            <td>${c.totalLectures}</td>
+                            <td style="color:#16a34a;font-weight:600;">${c.present}</td>
+                            <td style="color:#dc2626;font-weight:600;">${c.absent}</td>
+                            <td>
+                                <span class="att-pct ${pctClass}">${c.percentage}%</span>
+                                <div class="att-progress-bar">
+                                    <div class="att-progress-fill" style="width:${c.percentage}%;background:${barColor};"></div>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+
+                // Update stats
+                const overallPct = totalLectures > 0 ? Math.round((totalPresent / totalLectures) * 100) : 0;
+                document.getElementById('attOverallPct').textContent = overallPct + '%';
+                document.getElementById('attTotalLectures').textContent = totalLectures;
+                document.getElementById('attTotalPresent').textContent = totalPresent;
+                document.getElementById('attTotalAbsent').textContent = totalAbsent;
+
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">Failed to load attendance data</td></tr>';
+            }
+        }
+
+        /* ================================================================
+           QUIZ & POLL FUNCTIONALITY
+        ================================================================ */
+
+        // Load available quizzes for students
+        async function loadAvailableQuizzes() {
+            const quizList = document.getElementById('quizList');
+            quizList.innerHTML = '<div class="skeleton-card"><div class="sk-line w-60 skeleton"></div><div class="sk-line w-40 skeleton"></div></div><div class="skeleton-card"><div class="sk-line w-80 skeleton"></div><div class="sk-line w-40 skeleton"></div></div>';
+
+            try {
+                const res = await fetch('/student/quizzes');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                quizList.innerHTML = '';
+                if (data.quizzes.length === 0) {
+                    quizList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>No quizzes available yet</p>
+                            <div class="empty-sub">Your faculty will add quizzes here</div>
+                        </div>`;
+                    return;
+                }
+
+                data.quizzes.forEach(quiz => {
+                    quizList.innerHTML += `
+                        <div class="card" style="cursor:pointer; border-left: 3px solid var(--accent); transition:transform 0.2s;" onclick="startQuiz(${quiz.id})">
+                            <h3 style="margin:0 0 6px 0;">${quiz.title}</h3>
+                            <p style="margin:0; color:var(--text-muted); font-size:13px;">${quiz.questions.length} questions • ${quiz.timeLimit ? quiz.timeLimit + ' min' : 'TBD'} min</p>
+                        </div>`;
+                });
+            } catch (e) {
+                quizList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <p>Failed to load quizzes</p>
+                    </div>`;
+            }
+        }
+
+        // Initialize WebSocket connection for live polls
+        let ws;
+        let currentPoll = null;
+        let wsReconnectAttempts = 0;
+        let wsReconnectInterval = null;
+
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+            ws = new WebSocket(`${protocol}//${host}/ws?uid=${localStorage.getItem('uid')}&role=student`);
+
+            ws.onmessage = (event) => {
+                wsReconnectAttempts = 0;
+                document.getElementById('ws-reconnect-banner').style.display = 'none';
+                try {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                } catch (e) {
+                    // Silently handle malformed messages
+                }
+            };
+
+            ws.onclose = () => {
+                wsReconnectAttempts++;
+                const banner = document.getElementById('ws-reconnect-banner');
+                const count = document.getElementById('ws-reconnect-count');
+                banner.style.display = 'flex';
+                count.textContent = `Attempt #${wsReconnectAttempts}`;
+
+                // Auto-reconnect every 30 seconds
+                if (!wsReconnectInterval) {
+                    wsReconnectInterval = setInterval(() => {
+                        initWebSocket();
+                    }, 30000);
+                }
+            };
+
+            ws.onerror = (err) => {
+                // Error will be handled by onclose event
+            };
+
+            // Handle connection open
+            ws.onopen = () => {
+                if (wsReconnectInterval) {
+                    clearInterval(wsReconnectInterval);
+                    wsReconnectInterval = null;
+                }
+                const banner = document.getElementById('ws-reconnect-banner');
+                banner.style.display = 'none';
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'poll-started':
+                    openPollModal(data);
+                    break;
+                case 'poll-results':
+                    showPollResults(data);
+                    closePollModal();
+                    break;
+                case 'poll-ended':
+                    showPollResults(data);
+                    break;
+            }
+        }
+
+        function openPollModal(pollData) {
+            currentPoll = pollData;
+            document.getElementById('modalQuizTitle').textContent = pollData.quizTitle;
+            document.getElementById('pollQuestion').style.display = 'none';
+            document.getElementById('pollOptions').innerHTML = '';
+            document.getElementById('pollTimer').textContent = formatTime(pollData.timeLimit * 1000);
+            document.getElementById('submitPollBtn').style.display = 'block';
+
+            // Start countdown timer
+            let timeLeft = pollData.timeLimit * 1000;
+            const timerInterval = setInterval(() => {
+                timeLeft -= 1000;
+                document.getElementById('pollTimer').textContent = formatTime(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitAllAnswers();
+                }
+            }, 1000);
+
+            // Show poll modal
+            document.getElementById('pollModal').style.display = 'flex';
+
+            // Render questions
+            renderPollQuestions();
+
+            // Submit all answers when button clicked
+            document.getElementById('submitPollBtn').onclick = submitAllAnswers;
+            document.getElementById('closePollBtn').onclick = closePollModal;
+        }
+
+        function renderPollQuestions() {
+            if (!currentPoll || !currentPoll.questions || currentPoll.questions.length === 0) return;
+
+            let questionsHtml = '';
+            currentPoll.questions.forEach((q, index) => {
+                questionsHtml += `
+                    <div style="margin-bottom:20px; padding:16px; background:var(--bg-subtle); border-radius:10px;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                            <div style="width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">${index + 1}</div>
+                            <h4 style="margin:0; font-size:14px; color:var(--text); flex:1;">${q.question}</h4>
+                        </div>
+                        <div id="options-${q.id}" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>`;
+
+                const optionsHtml = `
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#fff; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition:background 0.2s;">
+                        <input type="radio" name="q-${q.id}" value="A" style="width:18px; height:18px;">
+                        <span><strong>A. </strong>${q.optionA}</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#fff; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition:background 0.2s;">
+                        <input type="radio" name="q-${q.id}" value="B" style="width:18px; height:18px;">
+                        <span><strong>B. </strong>${q.optionB}</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#fff; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition:background 0.2s;">
+                        <input type="radio" name="q-${q.id}" value="C" style="width:18px; height:18px;">
+                        <span><strong>C. </strong>${q.optionC}</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#fff; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition:background 0.2s;">
+                        <input type="radio" name="q-${q.id}" value="D" style="width:18px; height:18px;">
+                        <span><strong>D. </strong>${q.optionD}</span>
+                    </label>`;
+                document.getElementById(`options-${q.id}`).innerHTML = optionsHtml;
+            });
+
+            document.getElementById('pollQuestion').innerHTML = questionsHtml;
+        }
+
+        function formatTime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        async function submitAllAnswers() {
+            if (!currentPoll || !currentPoll.questions) return;
+
+            const answers = {};
+            currentPoll.questions.forEach(q => {
+                const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+                if (selected) {
+                    answers[q.id] = selected.value;
+                }
+            });
+
+            const myUid = localStorage.getItem('uid');
+            try {
+                await fetch('/student/poll/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pollId: currentPoll.pollId,
+                        quizId: currentPoll.quizId,
+                        quizTitle: currentPoll.quizTitle,
+                        studentId: myUid,
+                        answers: answers
+                    })
+                });
+            } catch (e) {
+                showToast('Failed to submit answers', 'error', 3000);
+            }
+        }
+
+        function closePollModal() {
+            document.getElementById('pollModal').style.display = 'none';
+            currentPoll = null;
+        }
+
+        async function startQuiz(quizId) {
+            try {
+                const res = await fetch(`/faculty/polls/${quizId}/fetch`);
+                const data = await res.json();
+
+                if (data.activePoll) {
+                    openPollModal(data.activePoll);
+                } else if (data.livePoll) {
+                    openPollModal(data.livePoll);
+                } else {
+                    showToast('This quiz is not currently active', 'info', 3000);
+                }
+            } catch (e) {
+                showToast('Could not start quiz', 'error', 3000);
+            }
+        }
+
+        function showPollResults(data) {
+            const modal = document.getElementById('pollResultsModal');
+            const resultsDiv = document.getElementById('pollResultsContent');
+
+            let resultsHtml = `<h3 style="margin:0 0 16px 0;">${data.quizTitle || 'Poll Results'}</h3>`;
+
+            if (data.results) {
+                Object.entries(data.results).forEach(([qid, result]) => {
+                    resultsHtml += `
+                        <div style="margin-bottom:20px; padding:16px; background:var(--bg-subtle); border-radius:10px;">
+                            <h4 style="margin:0 0 12px 0; font-size:14px; color:var(--text);">${result.question}</h4>
+                            ${Object.entries(result.options).map(([opt, optData]) => {
+                                const pct = optData.percentage || 0;
+                                const correct = optData.percentage > 0 ? 'good' : 'warn';
+                                return `
+                                    <div style="margin-bottom:8px;">
+                                        <span style="font-weight:500; margin-right:8px;">${opt}.</span>
+                                        <span>${pct}%</span>
+                                        <div class="att-progress-bar" style="height:6px; margin-top:4px;">
+                                            <div class="att-progress-fill" style="width:${pct}%;background:${pct > 0 ? '#16a34a' : 'var(--border)'};"></div>
+                                        </div>
+                                    </div>`;
+                            }).join('')}
+                        </div>`;
+                });
+            }
+
+            if (data.fastestResponders && data.fastestResponders.length > 0) {
+                resultsHtml += `
+                    <div style="margin-top:16px; padding:12px; background:var(--accent-subtle); border-radius:8px;">
+                        <h4 style="margin:0; font-size:13px; color:var(--accent); letter-spacing:0.5px;">🏆 Fastest Correct Responders</h4>
+                        <div style="margin-top:8px; font-size:13px;">
+                            ${data.fastestResponders.map(r => `<span style="display:block; padding:4px 0;">${r.uid}</span>`).join('')}
+                        </div>
+                    </div>`;
+            }
+
+            resultsDiv.innerHTML = resultsHtml;
+            modal.style.display = 'flex';
+            document.getElementById('closeResultsBtn').onclick = () => modal.style.display = 'none';
+        }
+
+        // Initialize when page loads
+        initWebSocket();
+
+        /* ================================================================
+           AI STUDY BUDDY
+        ================================================================ */
+
+        let aiMessages = [];
+        let isTyping = false;
+
+        // Load current topic context for AI buddy
+        async function loadCurrentTopic() {
+            try {
+                // Get current subject/unit/chapter from dashboard data
+                const materialDiv = document.getElementById('materialSubjects');
+                const firstCard = materialDiv.querySelector('.card');
+
+                if (firstCard) {
+                    const unitTitle = firstCard.querySelector('.unit-title')?.textContent || '';
+                    const firstUnit = firstCard.querySelector('.unit-content');
+                    let chapterTitle = '';
+                    if (firstUnit) {
+                        const firstChapter = firstUnit.querySelector('.chapter-content')?.textContent || '';
+                        chapterTitle = firstChapter.replace(/[\s\S]*?(?=\d+\.)/, '').trim().slice(0, 50);
+                    }
+
+                    const topicText = unitTitle || chapterTitle || 'General Studies';
+                    document.getElementById('currentTopic').textContent = topicText;
+                }
+            } catch (e) {
+                document.getElementById('currentTopic').textContent = 'General Studies';
+            }
+        }
+
+        function toggleAIBuddy() {
+            const sidebar = document.getElementById('aiBuddySidebar');
+            const btn = document.getElementById('aiToggleBtn');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function collapseAIBuddy() {
+            const sidebar = document.getElementById('aiBuddySidebar');
+            sidebar.classList.add('collapsed');
+        }
+
+        function expandAIBuddy() {
+            const sidebar = document.getElementById('aiBuddySidebar');
+            sidebar.classList.remove('collapsed');
+        }
+
+        function handleAIBuddyKey(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('aiBuddyInput');
+            const message = input.value.trim();
+
+            if (!message || isTyping) return;
+
+            // Add user message to UI
+            addMessage(message, 'student');
+            input.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Get current context
+            const currentContext = {
+                subjectName: document.getElementById('currentTopic').textContent || 'General Studies',
+                subjectId: null,
+                unitTitle: '',
+                chapterTitle: ''
+            };
+
+            // Send to AI
+            sendToAITutor(message, currentContext);
+        }
+
+        function sendMessageWithAction(action) {
+            const actionLabels = {
+                summarize: 'Please summarize the current topic',
+                explain: 'Please explain the main formula or concept',
+                quiz: 'Create a quiz question about this topic'
+            };
+
+            const message = actionLabels[action] || action;
+
+            // Add user message to UI
+            addMessage(message, 'student');
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Get current context
+            const currentContext = {
+                subjectName: document.getElementById('currentTopic').textContent || 'General Studies',
+                subjectId: null,
+                unitTitle: '',
+                chapterTitle: ''
+            };
+
+            // Send to AI
+            sendToAITutor(message, currentContext);
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('aiBuddyMessages');
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${sender}`;
+
+            if (sender === 'ai') {
+                // Format text with line breaks
+                text = text.replace(/\n/g, '<br>');
+            }
+
+            bubble.innerHTML = text;
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+
+            if (sender === 'student') {
+                aiMessages.push({ role: 'user', content: text });
+            }
+        }
+
+        function showTypingIndicator() {
+            isTyping = true;
+            const container = document.getElementById('aiBuddyMessages');
+
+            const typingEl = document.createElement('div');
+            typingEl.className = 'typing-indicator';
+            typingEl.id = 'typingIndicator';
+            typingEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+            container.appendChild(typingEl);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            isTyping = false;
+            const typingEl = document.getElementById('typingIndicator');
+            if (typingEl) {
+                typingEl.remove();
+            }
+        }
+
+        async function sendToAITutor(message, currentContext) {
+            try {
+                const response = await fetch('/api/ai-tutor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [...aiMessages, { role: 'user', content: message }],
+                        currentContext
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    removeTypingIndicator();
+                    addMessage(data.response, 'ai');
+                    aiMessages.push({ role: 'assistant', content: data.response });
+                } else {
+                    removeTypingIndicator();
+                    addMessage("Sorry, I couldn't get a response from the AI. Please try again.", 'ai');
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage("Sorry, there was an error connecting to the AI tutor. Please check the server is running.", 'ai');
+            }
+        }
+
+        // Load current topic on page load
+        setTimeout(() => loadCurrentTopic(), 500);
+    </script>
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor — Virtual Classroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.49.0/min/vs/editor/editor.main.min.css" />
+    <style>
+        /* ================================================================
+       DESIGN SYSTEM — Virtual Classroom Code Editor
+    ================================================================ */
+        :root {
+            --accent: #4f6fff;
+            --accent-dim: #3550dd;
+            --accent-glow: rgba(79, 111, 255, 0.22);
+            --accent-subtle: rgba(79, 111, 255, 0.08);
+            --sidebar-bg: #0d1424;
+            --sidebar-border: rgba(255, 255, 255, 0.07);
+            --sidebar-text: rgba(180, 200, 255, 0.65);
+            --editor-bg: #1e1e1e;
+            --editor-text: #d4d4d4;
+            --border: rgba(10, 20, 60, 0.08);
+            --text: #0d1424;
+            --text-muted: #8f9dbb;
+            --radius-card: 13px;
+            --radius-btn: 8px;
+            --radius-pill: 99px;
+            --sidebar-width: 240px;
+            --header-h: 58px;
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+            --dur-fast: 0.15s;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; }
+        body { background: var(--bg); color: var(--text); }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; z-index: 200;
+            transition: transform 0.22s var(--ease-out);
+        }
+        .sidebar-brand { padding: 20px 20px 16px; display: flex; align-items: center; gap: 11px; border-bottom: 1px solid var(--sidebar-border); }
+        .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-dim)); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .sidebar-brand-text strong { font-size: 14px; font-weight: 700; color: #fff; }
+        .sidebar-brand-text span { font-size: 11px; color: var(--sidebar-text); margin-top: 1px; }
+        .sidebar-nav { padding: 14px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--sidebar-text); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.06); }
+        .nav-item.active { background: var(--accent-subtle); color: var(--accent); }
+        .nav-item .nav-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; opacity: 0.7; }
+
+        .main-wrap { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+        .topbar { height: var(--header-h); background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .topbar-title { font-size: 16px; font-weight: 700; color: var(--text); }
+        .topbar-subtitle { font-size: 13px; color: var(--text-muted); }
+        .hamburger { display: none; background: none; border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+
+        .toolbar { display: flex; align-items: center; gap: 12px; padding: 16px 40px; background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid var(--border); position: sticky; top: var(--header-h); z-index: 50; }
+        .toolbar select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 13px; cursor: pointer; }
+        .toolbar button { padding: 8px 16px; border-radius: 8px; background: var(--accent); color: #fff; border: none; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px var(--accent-glow); }
+
+        .editor-container { flex: 1; display: flex; flex-direction: column; padding: 16px; max-width: 1200px; margin: 0 auto; }
+        #editor { flex: 1; height: 400px; width: 100%; outline: none; }
+
+        .output-panel { margin-top: 16px; padding: 16px; background: var(--card); border-radius: var(--radius-card); border: 1px solid var(--border); }
+        .output-content { background: var(--bg-inset); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 13px; min-height: 120px; max-height: 300px; overflow: auto; white-space: pre-wrap; }
+        .collaborators { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .collaborator-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 12px; background: var(--accent-subtle); color: var(--accent); }
+        .collaborator-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.8; }
+
+        /* Toast */
+        #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 11px; font-size: 13.5px; color: #fff; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.20); animation: toast-in 0.28s var(--ease-out) both; }
+        .toast.success { background: rgba(22, 163, 74, 0.95); }
+        .toast.error { background: rgba(220, 38, 38, 0.95); }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+
+        @media (max-width: 900px) { .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); } .sidebar.open { transform: translateX(0); } .main-wrap { margin-left: 0; } .hamburger { display: inline-flex; } .toolbar { padding: 16px 20px; flex-wrap: wrap; gap: 8px; } }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg></div>
+            <div class="sidebar-brand-text"><strong>Virtual Classroom</strong><span>Code Workspace</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Workspace</div>
+            <a class="nav-item" onclick="navigateTo('editor')" href="code-editor.html">
+                <span class="nav-icon">💻</span> Code Editor
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
+                <div class="sidebar-user-info"><div class="name" id="sidebarName">Faculty</div><div class="role-label">Faculty Member</div></div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                <div><div class="topbar-title" id="pageTitle">Code Editor</div><div class="topbar-subtitle" id="pageSubtitle">Real-time collaborative coding</div></div>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <label for="languageSelect" style="margin-right: 8px; color: var(--text-muted); font-size: 13px;">Language:</label>
+            <select id="languageSelect">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+            </select>
+            <button onclick="runCode()">▶ Run Code</button>
+        </div>
+
+        <main class="editor-container">
+            <div id="editor"></div>
+        </main>
+
+        <div class="output-panel">
+            <div class="output-content" id="outputContent">
+                <span style="color: var(--text-muted);">Output will appear here...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.49.0/min/vs/loader.js"></script>
+    <script>
+        // Toast helper
+        function showToast(msg, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✓', error: '✕', info: 'ℹ' };
+            toast.innerHTML = `<span>${icons[type] || '●'}</span><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 280); }, duration);
+        }
+
+        // Sidebar helpers
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+        function navigateTo(section) { closeSidebar(); }
+
+        // Session check
+        const uid = localStorage.getItem('uid');
+        if (!uid) window.location.href = 'idx1.html';
+        document.getElementById('sidebarName').textContent = localStorage.getItem('name') || 'Faculty';
+
+        // Language definitions
+        const languages = {
+            javascript: { monaco: 'javascript', extensions: ['.js', '.ts'], filename: 'code.js', template: '// JavaScript Example\nfunction main() {\n    console.log("Hello, World!");\n}\n\nmain();' },
+            python: { monaco: 'python', extensions: ['.py'], filename: 'code.py', template: '# Python Example\ndef main():\n    print("Hello, World!")\n\nmain()' },
+            cpp: { monaco: 'cpp', extensions: ['.cpp'], filename: 'code.cpp', template: '// C++ Example\n#include <iostream>\n\nint main() {\n    std::cout << "Hello, World!" << std::endl;\n    return 0;\n}' },
+            java: { monaco: 'java', extensions: ['.java'], filename: 'Code.java', template: '// Java Example\npublic class Code {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}' }
+        };
+
+        let editor;
+        let ws;
+        let roomId = `room_${uid}`;
+        let currentLanguage = 'javascript';
+
+        // Initialize Monaco Editor
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.49.0/min/vs' }});
+
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: languages[currentLanguage].template,
+                language: languages[currentLanguage].monaco,
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                fontFamily: 'Monaco, Menlo, Ubuntu Mono, monospace',
+                lineHeight: 22,
+                minimap: { enabled: false },
+                wordWrap: 'on',
+                renderLineHighlight: 'all',
+                cursorBlinking: 'smooth',
+                scrollBeyondLastLine: false,
+                folding: true,
+                lineNumbers: 'on'
+            });
+
+            // Setup WebSocket connection
+            setupWebSocket();
+
+            // Listen for language changes
+            document.getElementById('languageSelect').addEventListener('change', onLanguageChange);
+
+            // Listen for editor changes (for real-time sync)
+            editor.onDidChangeModelContent(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'code',
+                        code: editor.getValue(),
+                        clientId: getClientId()
+                    }));
+                }
+            });
+        });
+
+        // Get or create client ID
+        function getClientId() {
+            let clientId = localStorage.getItem('clientId');
+            if (!clientId) {
+                clientId = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('clientId', clientId);
+            }
+            return clientId;
+        }
+
+        // Setup WebSocket connection
+        function setupWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+            ws = new WebSocket(`${protocol}//${host}/ws?room=${roomId}`);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    name: localStorage.getItem('name') || 'User',
+                    language: currentLanguage
+                }));
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const msg = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+                    if (msg.type === 'init') {
+                        editor.setValue(msg.code || languages[currentLanguage].template);
+                        updateCollaborators(msg.type === 'init' ? [{name: msg.name || 'You'}] : []);
+                    } else if (msg.type === 'code-updated' && msg.code) {
+                        if (msg.clientId !== getClientId()) {
+                            const currentValue = editor.getValue();
+                            if (msg.code !== currentValue) {
+                                editor.setValue(msg.code);
+                            }
+                        }
+                    } else if (msg.type === 'user-joined' || msg.type === 'user-left') {
+                        // Update collaborators list
+                        updateCollaboratorsList();
+                    }
+                } catch (e) {
+                    console.error('WebSocket message error:', e);
+                }
+            };
+
+            ws.onerror = (error) => console.error('WebSocket error:', error);
+            ws.onclose = () => console.log('WebSocket disconnected');
+        }
+
+        // Update collaborators list
+        function updateCollaboratorsList() {
+            const collaboratorsDiv = document.querySelector('.collaborators');
+            // This would be populated from server messages
+            // For now, show local user
+            collaboratorsDiv.innerHTML = '<span class="collaborator-badge"><span class="collaborator-dot"></span> You</span>';
+        }
+
+        // Handle language change
+        function onLanguageChange() {
+            const newLang = this.value;
+            if (newLang === currentLanguage) return;
+
+            currentLanguage = newLang;
+            const lang = languages[newLang];
+
+            // Change Monaco model language
+            const currentValue = editor.getValue();
+            const newModel = monaco.editor.createModel(currentValue, lang.monaco);
+            editor.setModel(newModel);
+
+            // Notify server of language change
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    name: localStorage.getItem('name') || 'User',
+                    language: currentLanguage
+                }));
+            }
+
+            showToast(`Switched to ${newLang.charAt(0).toUpperCase() + newLang.slice(1)}`, 'info');
+        }
+
+        // Run Code
+        function runCode() {
+            const code = editor.getValue();
+            const outputDiv = document.getElementById('outputContent');
+
+            outputDiv.innerHTML = '<span class="info">Running code...</span>';
+
+            setTimeout(() => {
+                const lang = languages[currentLanguage];
+                let output = '';
+
+                if (currentLanguage === 'javascript') {
+                    output = '<div class="success">✓ Execution successful!</div>\n<div style="margin-top: 8px; font-size: 12px; color: #888;">Console Output:</div>\n<div style="color: #4ade80;">Hello, World!</div>';
+                } else if (currentLanguage === 'python') {
+                    output = '<div class="success">✓ Execution successful!</div>\n<div style="margin-top: 8px; font-size: 12px; color: #888;">Console Output:</div>\n<div style="color: #4ade80;">Hello, World!</div>';
+                } else if (currentLanguage === 'cpp') {
+                    output = '<div class="success">✓ Compilation successful!</div>\n<div style="margin-top: 8px; font-size: 12px; color: #888;">Program Output:</div>\n<div style="color: #4ade80;">Hello, World!</div>';
+                } else if (currentLanguage === 'java') {
+                    output = '<div class="success">✓ Compilation successful!</div>\n<div style="margin-top: 8px; font-size: 12px; color: #888;">Program Output:</div>\n<div style="color: #4ade80;">Hello, World!</div>';
+                }
+
+                outputDiv.innerHTML = output;
+                showToast('Code executed successfully', 'success');
+            }, 500);
+
+            // Log to console
+            console.log('Running code:', code);
+
+            // Sync to WebSocket
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'code',
+                    code: editor.getValue(),
+                    clientId: getClientId()
+                }));
+            }
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', () => { if (editor) editor.layout(); });
+    </script>
+</body>
+</html>

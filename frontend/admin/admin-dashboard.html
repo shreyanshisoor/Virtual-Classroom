@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Virtual Classroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+            </div>
+            <span>Admin Panel</span>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-page="overview" onclick="showPage('overview')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Overview
+            </button>
+            <button class="nav-item" data-page="users" onclick="showPage('users')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Manage Users
+            </button>
+            <button class="nav-item" data-page="sections" onclick="showPage('sections')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+                Manage Sections
+            </button>
+            <button class="nav-item" data-page="courses" onclick="showPage('courses')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Manage Courses
+            </button>
+            <button class="nav-item" data-page="assignments" onclick="showPage('assignments')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="9 11 12 14 22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+                Assignments
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h2 id="pageTitle">Overview</h2>
+            <div class="admin-badge">
+                <span id="adminName">Admin</span>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <!-- OVERVIEW PAGE -->
+        <div class="page active" id="page-overview">
+            <div class="stats-grid">
+                <div class="stat-card stat-students">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                        </svg></div>
+                    <div class="stat-info"><span class="stat-value" id="statStudents">0</span><span
+                            class="stat-label">Students</span></div>
+                </div>
+                <div class="stat-card stat-faculty">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg></div>
+                    <div class="stat-info"><span class="stat-value" id="statFaculty">0</span><span
+                            class="stat-label">Faculty</span></div>
+                </div>
+                <div class="stat-card stat-sections">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        </svg></div>
+                    <div class="stat-info"><span class="stat-value" id="statSections">0</span><span
+                            class="stat-label">Sections</span></div>
+                </div>
+                <div class="stat-card stat-courses">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg></div>
+                    <div class="stat-info"><span class="stat-value" id="statCourses">0</span><span
+                            class="stat-label">Courses</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USERS PAGE -->
+        <div class="page" id="page-users">
+            <div class="page-actions">
+                <div class="filter-group">
+                    <button class="filter-btn active" onclick="filterUsers('all')">All</button>
+                    <button class="filter-btn" onclick="filterUsers('student')">Students</button>
+                    <button class="filter-btn" onclick="filterUsers('faculty')">Faculty</button>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-primary" onclick="openModal('createStudentModal')">+ Student</button>
+                    <button class="btn-primary" onclick="openModal('createFacultyModal')">+ Faculty</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>UID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTIONS PAGE -->
+        <div class="page" id="page-sections">
+            <div class="page-actions"><button class="btn-primary" onclick="openModal('createSectionModal')">+ New
+                    Section</button></div>
+            <div class="sections-grid" id="sectionsGrid"></div>
+        </div>
+
+        <!-- COURSES PAGE -->
+        <div class="page" id="page-courses">
+            <div class="page-actions"><button class="btn-primary" onclick="openModal('createCourseModal')">+ New
+                    Course</button></div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Section</th>
+                            <th>Faculty</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coursesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ASSIGNMENTS PAGE -->
+        <div class="page" id="page-assignments">
+            <div class="assign-grid">
+                <div class="assign-card">
+                    <h3>Assign Student to Section</h3>
+                    <select id="assignStudentId" class="form-select"></select>
+                    <select id="assignStudentSectionId" class="form-select"></select>
+                    <button class="btn-primary" onclick="assignStudentSection()">Assign</button>
+                </div>
+                <div class="assign-card">
+                    <h3>Assign Teacher to Section</h3>
+                    <select id="assignTeacherSectionFacultyId" class="form-select"></select>
+                    <select id="assignTeacherSectionSectionId" class="form-select"></select>
+                    <button class="btn-primary" onclick="assignTeacherSection()">Assign</button>
+                </div>
+                <div class="assign-card">
+                    <h3>Assign Teacher to Course</h3>
+                    <select id="assignTeacherCourseFacultyId" class="form-select"></select>
+                    <select id="assignTeacherCourseCourseId" class="form-select"></select>
+                    <button class="btn-primary" onclick="assignTeacherCourse()">Assign</button>
+                </div>
+                <div class="assign-card">
+                    <h3>Assign Course to Section</h3>
+                    <select id="assignCourseSectionCourseId" class="form-select"></select>
+                    <select id="assignCourseSectionSectionId" class="form-select"></select>
+                    <button class="btn-primary" onclick="assignCourseSection()">Assign</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="createStudentModal">
+        <div class="modal">
+            <h3>Create Student</h3>
+            <input type="text" id="newStudentUid" placeholder="Student UID" class="form-input">
+            <input type="text" id="newStudentName" placeholder="Full Name" class="form-input">
+            <input type="password" id="newStudentPass" placeholder="Password" class="form-input">
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('createStudentModal')">Cancel</button><button class="btn-primary"
+                    onclick="createStudent()">Create</button></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="createFacultyModal">
+        <div class="modal">
+            <h3>Create Faculty</h3>
+            <input type="text" id="newFacultyUid" placeholder="Faculty UID" class="form-input">
+            <input type="text" id="newFacultyName" placeholder="Full Name" class="form-input">
+            <input type="password" id="newFacultyPass" placeholder="Password" class="form-input">
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('createFacultyModal')">Cancel</button><button class="btn-primary"
+                    onclick="createFaculty()">Create</button></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="createSectionModal">
+        <div class="modal">
+            <h3>Create Section</h3>
+            <input type="text" id="newSectionCode" placeholder="Section Code (e.g. CS-B)" class="form-input">
+            <input type="number" id="newSectionSemester" placeholder="Semester" class="form-input">
+            <input type="text" id="newSectionBranch" placeholder="Branch" class="form-input">
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('createSectionModal')">Cancel</button><button class="btn-primary"
+                    onclick="createSection()">Create</button></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="createCourseModal">
+        <div class="modal">
+            <h3>Create Course</h3>
+            <input type="text" id="newCourseName" placeholder="Course Name" class="form-input">
+            <select id="newCourseSectionId" class="form-select"></select>
+            <select id="newCourseFacultyId" class="form-select"></select>
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('createCourseModal')">Cancel</button><button class="btn-primary"
+                    onclick="createCourse()">Create</button></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast-container"></div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

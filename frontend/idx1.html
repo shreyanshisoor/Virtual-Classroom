@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Classroom — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ================================================================
+       DESIGN SYSTEM — Virtual Classroom Auth
+    ================================================================ */
+        :root {
+            --accent: #4f6fff;
+            --accent-dim: #3550dd;
+            --accent-glow: rgba(79, 111, 255, 0.36);
+            --accent-subtle: rgba(79, 111, 255, 0.10);
+            --bg-base: #07101f;
+            --bg-mid: #0d1a30;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.10);
+            --glass-top: rgba(255, 255, 255, 0.17);
+            --text-primary: #eef2ff;
+            --text-secondary: rgba(180, 200, 255, 0.72);
+            --text-muted: rgba(140, 170, 230, 0.42);
+            --input-bg: rgba(255, 255, 255, 0.065);
+            --input-border: rgba(255, 255, 255, 0.11);
+            --radius-card: 18px;
+            --radius-input: 10px;
+            --radius-btn: 10px;
+            --radius-pill: 99px;
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+            --dur-fast: 0.16s;
+            --dur-base: 0.24s;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background: var(--bg-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── Dynamic Role Background ── */
+        .login-bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .login-bg-layer.active {
+            opacity: 1;
+        }
+
+        /* Dark overlay for readability */
+        .login-bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background:
+                radial-gradient(ellipse 80% 70% at 10% 65%, rgba(79, 111, 255, 0.10) 0%, transparent 65%),
+                radial-gradient(ellipse 55% 55% at 88% 12%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(7, 16, 31, 0.72) 0%, rgba(7, 16, 31, 0.85) 100%);
+            pointer-events: none;
+        }
+
+        /* Put all visible content above backgrounds */
+        .brand-mark,
+        .card,
+        #toast-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 99px;
+        }
+
+        /* ================================================================
+       BRAND MARK
+    ================================================================ */
+        .brand-mark {
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            animation: fadeSlideDown 0.5s var(--ease-out) both;
+        }
+
+        .brand-mark .logo-ring {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .brand-mark h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            color: var(--text-primary);
+        }
+
+        /* ================================================================
+       AUTH CARD
+    ================================================================ */
+        .card {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-top-color: var(--glass-top);
+            padding: 40px 38px 36px;
+            border-radius: var(--radius-card);
+            width: 400px;
+            color: var(--text-primary);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                0 2px 4px rgba(0, 0, 0, 0.15),
+                0 16px 48px rgba(0, 0, 0, 0.55),
+                0 40px 80px rgba(0, 0, 0, 0.28);
+            overflow: hidden;
+            animation: fadeSlideUp 0.5s 0.1s var(--ease-out) both;
+        }
+
+        /* Animated top accent bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, #7094ff, var(--accent), #93c5fd, var(--accent), #7094ff);
+            background-size: 300% 100%;
+            animation: bar-slide 5s linear infinite;
+        }
+
+        @keyframes bar-slide {
+            0% {
+                background-position: 0% 0;
+            }
+
+            100% {
+                background-position: 300% 0;
+            }
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Heading ── */
+        #formTitle {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* ── Inputs ── */
+        #authForm {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin: 7px 0;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius-input);
+            outline: none;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            letter-spacing: 0.1px;
+            transition:
+                border-color var(--dur-fast) ease,
+                background var(--dur-fast) ease,
+                box-shadow var(--dur-fast) ease;
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        input:focus {
+            border-color: rgba(79, 111, 255, 0.6);
+            background: rgba(255, 255, 255, 0.10);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* ── Primary button ── */
+        button {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 12.5px 16px;
+            margin-top: 12px;
+            border: none;
+            border-radius: var(--radius-btn);
+            background: linear-gradient(135deg, #6b97ff 0%, var(--accent) 50%, var(--accent-dim) 100%);
+            background-size: 200% 100%;
+            background-position: 100% 0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px var(--accent-glow);
+            transition:
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) ease,
+                background-position 0.4s ease;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background-position: 0% 0;
+            box-shadow: 0 4px 24px rgba(79, 111, 255, 0.58);
+        }
+
+        button:hover::after {
+            transform: translateX(100%);
+        }
+
+        button:active {
+            transform: translateY(0) scale(0.988);
+            transition-duration: 0.08s;
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ── Mode switch link ── */
+        .switch {
+            position: relative;
+            display: inline-block;
+            margin-top: 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: rgba(150, 185, 255, 0.75);
+            text-align: center;
+            width: 100%;
+            transition: color var(--dur-fast) ease;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width var(--dur-base) var(--ease-out);
+        }
+
+        .switch:hover {
+            color: rgba(190, 215, 255, 0.92);
+        }
+
+        .switch:hover::after {
+            width: 60%;
+        }
+
+        /* ── Role switcher ── */
+        .role-switch {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .role-switch button {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin: 0;
+            padding: 7px 22px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-pill);
+            color: rgba(170, 200, 255, 0.6);
+            width: auto;
+            letter-spacing: 0.1px;
+            box-shadow: none;
+            background-position: unset;
+            background-size: unset;
+            transition:
+                background var(--dur-fast) ease,
+                border-color var(--dur-fast) ease,
+                color var(--dur-fast) ease;
+        }
+
+        .role-switch button::after {
+            display: none;
+        }
+
+        .role-switch button:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.30);
+            color: rgba(210, 230, 255, 0.9);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .role-switch button:active {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .active-role {
+            background: rgba(255, 255, 255, 0.91) !important;
+            color: #0d1a30 !important;
+            border-color: rgba(255, 255, 255, 0.55) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22) !important;
+        }
+
+        /* ================================================================
+       TOAST SYSTEM
+    ================================================================ */
+        #toast-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #fff;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            pointer-events: auto;
+            animation: toast-in 0.3s var(--ease-out) both;
+            max-width: 320px;
+        }
+
+        .toast.success {
+            background: rgba(22, 163, 74, 0.92);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .toast.error {
+            background: rgba(220, 38, 38, 0.92);
+            border: 1px solid rgba(248, 113, 113, 0.4);
+        }
+
+        .toast.info {
+            background: rgba(79, 111, 255, 0.92);
+            border: 1px solid rgba(147, 197, 253, 0.4);
+        }
+
+        .toast.fade-out {
+            animation: toast-out 0.3s ease forwards;
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+                transform: none;
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(8px) scale(0.96);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                width: 93vw;
+                padding: 36px 22px 30px;
+            }
+
+            .brand-mark {
+                margin-bottom: 24px;
+            }
+        }
+
+        /* ── Icon system ── */
+        .app-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: -3px;
+            flex-shrink: 0;
+        }
+
+        .logo-ring svg {
+            display: block;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* ── Password strength rules ── */
+        .pw-rules {
+            display: none;
+            margin: 8px 0 2px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            list-style: none;
+        }
+
+        .pw-rules.visible {
+            display: block;
+            animation: fadeSlideUp 0.25s var(--ease-out) both;
+        }
+
+        .pw-rules li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3.5px 0;
+            color: rgba(180, 200, 255, 0.4);
+            transition: color 0.2s ease;
+        }
+
+        .pw-rules li .icon {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .pw-rules li.pass {
+            color: rgba(34, 197, 94, 0.9);
+        }
+
+        .pw-rules li.pass .icon {
+            border-color: rgba(34, 197, 94, 0.6);
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dynamic role-based background layers (crossfade pair) -->
+    <div class="login-bg-layer" id="bgLayer1"></div>
+    <div class="login-bg-layer" id="bgLayer2"></div>
+    <div class="login-bg-overlay"></div>
+
+    <!-- Brand mark -->
+    <div class="brand-mark">
+        <div class="logo-ring"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg></div>
+        <h1>Virtual Classroom</h1>
+    </div>
+
+    <!-- Auth card — all IDs preserved for JS compatibility -->
+    <div class="card">
+
+        <h2 id="formTitle">Student Login</h2>
+
+        <form id="authForm">
+            <input type="text" id="name" placeholder="Enter Full Name" style="display: none;">
+            <input type="text" id="uid" placeholder="Enter UID" required>
+            <input type="password" id="password" placeholder="Enter Password" required>
+
+            <!-- Password strength rules (visible only in register mode) -->
+            <ul class="pw-rules" id="pwRules">
+                <li id="rule-length"><span class="icon">✕</span> At least 8 characters</li>
+                <li id="rule-upper"><span class="icon">✕</span> One uppercase letter</li>
+                <li id="rule-lower"><span class="icon">✕</span> One lowercase letter</li>
+                <li id="rule-number"><span class="icon">✕</span> One number</li>
+                <li id="rule-special"><span class="icon">✕</span> One special character</li>
+            </ul>
+
+            <button type="submit" id="submitBtn">Login</button>
+        </form>
+
+        <div class="switch" onclick="toggleMode()" id="toggleText">
+            Don't have an account? Register
+        </div>
+
+        <div class="role-switch">
+            <button onclick="switchRole('student')" id="studentBtn" class="active-role">Student</button>
+            <button onclick="switchRole('faculty')" id="facultyBtn">Faculty</button>
+            <button onclick="switchRole('admin')" id="adminBtn">Admin</button>
+        </div>
+
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <script>
+        /* ── Toast helper ── */
+        function showToast(msg, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✓', error: '✕', info: 'ℹ' };
+            toast.innerHTML = `<span>${icons[type] || '●'}</span><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 320);
+            }, duration);
+        }
+
+        /* ── Auth logic (all original IDs preserved) ── */
+        let mode = 'login';
+        let role = 'student';
+
+        function toggleMode() {
+            if (mode === 'login') {
+                mode = 'register';
+                document.getElementById('submitBtn').innerText = 'Register';
+                document.getElementById('toggleText').innerText = 'Already have an account? Login';
+                document.getElementById('name').style.display = 'block';
+                document.getElementById('pwRules').classList.add('visible');
+                checkPasswordRules(); // update state immediately
+            } else {
+                mode = 'login';
+                document.getElementById('submitBtn').innerText = 'Login';
+                document.getElementById('toggleText').innerText = "Don't have an account? Register";
+                document.getElementById('name').style.display = 'none';
+                document.getElementById('pwRules').classList.remove('visible');
+            }
+            updateTitle();
+        }
+
+        function switchRole(newRole) {
+            role = newRole;
+            document.getElementById('studentBtn').classList.remove('active-role');
+            document.getElementById('facultyBtn').classList.remove('active-role');
+            document.getElementById('adminBtn').classList.remove('active-role');
+            if (role === 'student') {
+                document.getElementById('studentBtn').classList.add('active-role');
+            } else if (role === 'faculty') {
+                document.getElementById('facultyBtn').classList.add('active-role');
+            } else if (role === 'admin') {
+                document.getElementById('adminBtn').classList.add('active-role');
+            }
+            // Admin has no register mode
+            if (role === 'admin' && mode === 'register') {
+                toggleMode();
+            }
+            // Hide register toggle for admin
+            document.getElementById('toggleText').style.display = role === 'admin' ? 'none' : 'block';
+            updateTitle();
+
+            // Update background image for selected role
+            setRoleBackground(role);
+        }
+
+        function updateTitle() {
+            document.getElementById('formTitle').innerText = capitalize(role) + ' ' + capitalize(mode);
+        }
+
+        function capitalize(text) {
+            return text.charAt(0).toUpperCase() + text.slice(1);
+        }
+
+        /* ── Role-based background images ── */
+        const studentImages = [
+            'images/bg/student/student_1_upscaled.png',
+            'images/bg/student/student_2_upscaled.png'
+        ];
+        const facultyImages = [
+            'images/bg/faculty/faculty_1_upscaled.png',
+            'images/bg/faculty/faculty_2_upscaled.png'
+        ];
+        const adminImages = [
+            'images/bg/Admin/admin_1_upscaled.png',
+            'images/bg/Admin/admin_2_upscaled.png'
+        ];
+
+        let activeBgLayer = 1; // tracks which layer is currently visible
+
+        function setRoleBackground(selectedRole) {
+            const imageMap = {
+                student: studentImages,
+                faculty: facultyImages,
+                admin: adminImages
+            };
+            const images = imageMap[selectedRole];
+            if (!images || images.length === 0) return;
+
+            const randomImg = images[Math.floor(Math.random() * images.length)];
+
+            // Crossfade between two layers for flicker-free transition
+            const incoming = activeBgLayer === 1 ? document.getElementById('bgLayer2') : document.getElementById('bgLayer1');
+            const outgoing = activeBgLayer === 1 ? document.getElementById('bgLayer1') : document.getElementById('bgLayer2');
+
+            incoming.style.backgroundImage = `url('${randomImg}')`;
+            incoming.classList.add('active');
+            outgoing.classList.remove('active');
+
+            activeBgLayer = activeBgLayer === 1 ? 2 : 1;
+        }
+
+        // Set initial background on page load
+        setRoleBackground('student');
+
+        document.getElementById('authForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const uid = document.getElementById('uid').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+
+            // Frontend-side password validation for register mode
+            if (mode === 'register' && !allPasswordRulesPassed()) {
+                showToast('Please meet all password requirements', 'error');
+                return;
+            }
+
+            const endpoint = mode === 'register'
+                ? `/register/${role}`
+                : `/login/${role}`;
+
+            btn.disabled = true;
+            btn.innerText = mode === 'register' ? 'Registering...' : 'Signing in...';
+
+            try {
+                const bodyData = { uid, password };
+                if (mode === 'register' && name) {
+                    bodyData.name = name;
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('uid', data.uid || uid);
+                    localStorage.setItem('role', role);
+                    if (data.name) localStorage.setItem('name', data.name);
+                    showToast(mode === 'register' ? 'Account created! Redirecting…' : 'Welcome back! Redirecting…', 'success', 1500);
+                    setTimeout(() => {
+                        if (role === 'student') {
+                            window.location.href = 'student-dashboard.html';
+                        } else if (role === 'faculty') {
+                            window.location.href = 'faculty-dashboard.html';
+                        } else if (role === 'admin') {
+                            window.location.href = 'admin/admin-dashboard.html';
+                        }
+                    }, 1200);
+                } else {
+                    showToast(data.error || 'Something went wrong', 'error');
+                    btn.disabled = false;
+                    btn.innerText = mode === 'login' ? 'Login' : 'Register';
+                }
+            } catch (error) {
+                showToast('Server not reachable. Is the backend running?', 'error');
+                btn.disabled = false;
+                btn.innerText = mode === 'login' ? 'Login' : 'Register';
+            }
+        });
+
+        /* ── Real-time password strength checker ── */
+        document.getElementById('password').addEventListener('input', checkPasswordRules);
+
+        function checkPasswordRules() {
+            const pw = document.getElementById('password').value;
+            toggleRule('rule-length', pw.length >= 8);
+            toggleRule('rule-upper', /[A-Z]/.test(pw));
+            toggleRule('rule-lower', /[a-z]/.test(pw));
+            toggleRule('rule-number', /\d/.test(pw));
+            toggleRule('rule-special', /[!@#$%^&*()_\-+=\[\]{};:'",.<>?\/\\|`~]/.test(pw));
+        }
+
+        function toggleRule(id, passed) {
+            const el = document.getElementById(id);
+            if (passed) {
+                el.classList.add('pass');
+                el.querySelector('.icon').textContent = '✓';
+            } else {
+                el.classList.remove('pass');
+                el.querySelector('.icon').textContent = '✕';
+            }
+        }
+
+        function allPasswordRulesPassed() {
+            const pw = document.getElementById('password').value;
+            return pw.length >= 8 &&
+                /[A-Z]/.test(pw) &&
+                /[a-z]/.test(pw) &&
+                /\d/.test(pw) &&
+                /[!@#$%^&*()_\-+=\[\]{};:'",.<>?\/\\|`~]/.test(pw);
+        }
+    </script>
+
+</body>
+
+</html>

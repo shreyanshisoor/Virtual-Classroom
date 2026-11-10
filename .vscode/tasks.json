@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Backend Server",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^\\[nodemon\\]",
+                    "endsPattern": "Server running on http://localhost:5000"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "dev"
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "Open Browser",
+            "type": "shell",
+            "command": "timeout 3 && start http://localhost:5000",
+            "windows": {
+                "command": "timeout /t 3 /nobreak > nul && start http://localhost:5000"
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "dependsOn": [
+                "Start Backend Server"
+            ]
+        }
+    ]
+}
