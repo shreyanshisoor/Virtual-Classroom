@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,7 +21,7 @@ model Section {
 model Student {
   id        Int      @id @default(autoincrement())
   uid       String   @unique
-  name      String ?
+  name      String?
   password  String
 
   section   Section?  @relation(fields: [sectionId], references: [id])
@@ -29,12 +29,13 @@ model Student {
 
   submissions QuizSubmission[]
   attendanceRecords AttendanceRecord[]
+  pollAnswers PollAnswer[]
 }
 
 model Faculty {
   id       Int      @id @default(autoincrement())
   uid      String   @unique
-   name     String?
+  name     String?
   password String
 
   subjects Subject[]
@@ -120,6 +121,7 @@ model Quiz {
 
   questions Question[]
   submissions QuizSubmission[]
+  polls Poll[]
 }
 
 model Question {
@@ -133,6 +135,7 @@ model Question {
 
   quiz     Quiz @relation(fields: [quizId], references: [id])
   quizId   Int
+  pollAnswers PollAnswer[]
 }
 
 model QuizSubmission {

@@ -14,10 +14,20 @@ const { validatePassword } = require("./middleware/validatePassword");
 const app = express();
 const prisma = new PrismaClient();
 
-// FILE UPLOAD CONFIG
+// FILE UPLOAD CONFIG - Use /tmp for uploads on Render (read-only filesystem)
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "uploads");
+
+// Ensure uploads directory exists
+const fs = require('fs');
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+} catch (e) {
+  console.error("Failed to create uploads directory:", e);
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -29,7 +39,7 @@ const upload = multer({ storage });
 app.use(cors());
 app.use(express.json());
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(uploadsDir));
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, "..", "frontend")));
@@ -1156,17 +1166,7 @@ app.get('/ws-health', (req, res) => {
 const server = http.createServer(app);
 const wss = createWebSocketServer(server);
 
-server.listen(5000, () => {
-  // Auto-open browser
-  const { exec } = require("child_process");
-  const platform = process.platform;
-  const url = "http://localhost:5000";
-
-  if (platform === "win32") {
-    exec(`start ${url}`);
-  } else if (platform === "darwin") {
-    exec(`open ${url}`);
-  } else {
-    exec(`xdg-open ${url}`);
-  }
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

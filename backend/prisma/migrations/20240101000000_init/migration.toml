@@ -1,0 +1,70 @@
+name = "20240101000000_init"
+type = "sql"
+
+[[tables]]
+name = "Section"
+schema = "public"
+
+[[tables]]
+name = "Student"
+schema = "public"
+
+[[tables]]
+name = "Faculty"
+schema = "public"
+
+[[tables]]
+name = "Subject"
+schema = "public"
+
+[[tables]]
+name = "Unit"
+schema = "public"
+
+[[tables]]
+name = "Chapter"
+schema = "public"
+
+[[tables]]
+name = "StudyMaterial"
+schema = "public"
+
+[[tables]]
+name = "Timetable"
+schema = "public"
+
+[[tables]]
+name = "LiveClass"
+schema = "public"
+
+[[tables]]
+name = "Quiz"
+schema = "public"
+
+[[tables]]
+name = "Question"
+schema = "public"
+
+[[tables]]
+name = "QuizSubmission"
+schema = "public"
+
+[[tables]]
+name = "Admin"
+schema = "public"
+
+[[tables]]
+name = "AttendanceSession"
+schema = "public"
+
+[[tables]]
+name = "AttendanceRecord"
+schema = "public"
+
+[[tables]]
+name = "Poll"
+schema = "public"
+
+[[tables]]
+name = "PollAnswer"
+schema = "public"

@@ -1,0 +1,282 @@
+-- Create tables for Section
+CREATE TABLE "Section" (
+    "id" SERIAL NOT NULL,
+    "code" TEXT NOT NULL,
+    "semester" INTEGER NOT NULL,
+    "branch" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "Section_code_key" ON "Section"("code");
+
+-- Create tables for Student
+CREATE TABLE "Student" (
+    "id" SERIAL NOT NULL,
+    "uid" TEXT NOT NULL,
+    "name" TEXT,
+    "password" TEXT NOT NULL,
+    "sectionId" INTEGER,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "Student_uid_key" ON "Student"("uid");
+CREATE INDEX "Student_sectionId_fkey_idx" ON "Student"("sectionId");
+
+-- Create tables for Faculty
+CREATE TABLE "Faculty" (
+    "id" SERIAL NOT NULL,
+    "uid" TEXT NOT NULL,
+    "name" TEXT,
+    "password" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "Faculty_uid_key" ON "Faculty"("uid");
+
+-- Create tables for Subject
+CREATE TABLE "Subject" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "sectionId" INTEGER NOT NULL,
+    "facultyId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Subject_sectionId_fkey_idx" ON "Subject"("sectionId");
+CREATE INDEX "Subject_facultyId_fkey_idx" ON "Subject"("facultyId");
+
+-- Create tables for Unit
+CREATE TABLE "Unit" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "subjectId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Unit_subjectId_fkey_idx" ON "Unit"("subjectId");
+
+-- Create tables for Chapter
+CREATE TABLE "Chapter" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "unitId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Chapter_unitId_fkey_idx" ON "Chapter"("unitId");
+
+-- Create tables for StudyMaterial
+CREATE TABLE "StudyMaterial" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "link" TEXT NOT NULL,
+    "uploadedAt" TIMESTAMP(3) NOT NULL DEFAULT now(),
+    "chapterId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "StudyMaterial_chapterId_fkey_idx" ON "StudyMaterial"("chapterId");
+
+-- Create tables for Timetable
+CREATE TABLE "Timetable" (
+    "id" SERIAL NOT NULL,
+    "day" TEXT NOT NULL,
+    "startTime" TEXT NOT NULL,
+    "endTime" TEXT NOT NULL,
+    "subjectId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Timetable_subjectId_fkey_idx" ON "Timetable"("subjectId");
+
+-- Create tables for LiveClass
+CREATE TABLE "LiveClass" (
+    "id" SERIAL NOT NULL,
+    "topic" TEXT NOT NULL,
+    "link" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "subjectId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "LiveClass_subjectId_fkey_idx" ON "LiveClass"("subjectId");
+
+-- Create tables for Quiz
+CREATE TABLE "Quiz" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "openDate" TIMESTAMP(3) NOT NULL,
+    "closeDate" TIMESTAMP(3) NOT NULL,
+    "timeLimit" INTEGER NOT NULL,
+    "attempts" INTEGER NOT NULL,
+    "unitId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Quiz_unitId_fkey_idx" ON "Quiz"("unitId");
+
+-- Create tables for Question
+CREATE TABLE "Question" (
+    "id" SERIAL NOT NULL,
+    "question" TEXT NOT NULL,
+    "optionA" TEXT NOT NULL,
+    "optionB" TEXT NOT NULL,
+    "optionC" TEXT NOT NULL,
+    "optionD" TEXT NOT NULL,
+    "correct" TEXT NOT NULL,
+    "quizId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Question_quizId_fkey_idx" ON "Question"("quizId");
+
+-- Create tables for QuizSubmission
+CREATE TABLE "QuizSubmission" (
+    "id" SERIAL NOT NULL,
+    "score" INTEGER NOT NULL,
+    "startedAt" TIMESTAMP(3) NOT NULL,
+    "completedAt" TIMESTAMP(3) NOT NULL,
+    "studentId" INTEGER NOT NULL,
+    "quizId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "QuizSubmission_studentId_fkey_idx" ON "QuizSubmission"("studentId");
+CREATE INDEX "QuizSubmission_quizId_fkey_idx" ON "QuizSubmission"("quizId");
+
+-- Create tables for Admin
+CREATE TABLE "Admin" (
+    "id" SERIAL NOT NULL,
+    "uid" TEXT NOT NULL,
+    "name" TEXT,
+    "password" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "Admin_uid_key" ON "Admin"("uid");
+
+-- Create tables for AttendanceSession
+CREATE TABLE "AttendanceSession" (
+    "id" SERIAL NOT NULL,
+    "lectureDate" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT now(),
+    "courseId" INTEGER NOT NULL,
+    "sectionId" INTEGER NOT NULL,
+    "facultyId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "AttendanceSession_courseId_fkey_idx" ON "AttendanceSession"("courseId");
+CREATE INDEX "AttendanceSession_sectionId_fkey_idx" ON "AttendanceSession"("sectionId");
+CREATE INDEX "AttendanceSession_facultyId_fkey_idx" ON "AttendanceSession"("facultyId");
+
+CREATE UNIQUE INDEX "AttendanceSession_courseId_sectionId_lectureDate_key" ON "AttendanceSession"("courseId", "sectionId", "lectureDate");
+
+-- Create tables for AttendanceRecord
+CREATE TABLE "AttendanceRecord" (
+    "id" SERIAL NOT NULL,
+    "status" TEXT NOT NULL,
+    "sessionId" INTEGER NOT NULL,
+    "studentId" INTEGER NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "AttendanceRecord_sessionId_fkey_idx" ON "AttendanceRecord"("sessionId");
+CREATE INDEX "AttendanceRecord_studentId_fkey_idx" ON "AttendanceRecord"("studentId");
+
+CREATE UNIQUE INDEX "AttendanceRecord_sessionId_studentId_key" ON "AttendanceRecord"("sessionId", "studentId");
+
+-- Create tables for Poll
+CREATE TABLE "Poll" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "quizId" INTEGER NOT NULL,
+    "startedAt" TIMESTAMP(3),
+    "endTime" TIMESTAMP(3),
+    "isActive" BOOLEAN NOT NULL DEFAULT false,
+    "timeLimit" INTEGER,
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Poll_quizId_fkey_idx" ON "Poll"("quizId");
+
+-- Create tables for PollAnswer
+CREATE TABLE "PollAnswer" (
+    "id" SERIAL NOT NULL,
+    "pollId" INTEGER NOT NULL,
+    "studentId" INTEGER NOT NULL,
+    "questionId" INTEGER NOT NULL,
+    "selectedOption" TEXT NOT NULL,
+    "answeredAt" TIMESTAMP(3) NOT NULL DEFAULT now(),
+
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "PollAnswer_pollId_fkey_idx" ON "PollAnswer"("pollId");
+CREATE INDEX "PollAnswer_studentId_fkey_idx" ON "PollAnswer"("studentId");
+CREATE INDEX "PollAnswer_questionId_fkey_idx" ON "PollAnswer"("questionId");
+
+CREATE UNIQUE INDEX "PollAnswer_pollId_studentId_questionId_key" ON "PollAnswer"("pollId", "studentId", "questionId");
+
+-- Add foreign key constraints
+ALTER TABLE "Student" ADD CONSTRAINT "Student_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "Subject" ADD CONSTRAINT "Subject_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Subject" ADD CONSTRAINT "Subject_facultyId_fkey" FOREIGN KEY ("facultyId") REFERENCES "Faculty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Unit" ADD CONSTRAINT "Unit_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Chapter" ADD CONSTRAINT "Chapter_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "StudyMaterial" ADD CONSTRAINT "StudyMaterial_chapterId_fkey" FOREIGN KEY ("chapterId") REFERENCES "Chapter"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Timetable" ADD CONSTRAINT "Timetable_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "LiveClass" ADD CONSTRAINT "LiveClass_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Quiz" ADD CONSTRAINT "Quiz_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Question" ADD CONSTRAINT "Question_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "QuizSubmission" ADD CONSTRAINT "QuizSubmission_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "QuizSubmission" ADD CONSTRAINT "QuizSubmission_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "AttendanceSession" ADD CONSTRAINT "AttendanceSession_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Subject"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "AttendanceSession" ADD CONSTRAINT "AttendanceSession_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "AttendanceSession" ADD CONSTRAINT "AttendanceSession_facultyId_fkey" FOREIGN KEY ("facultyId") REFERENCES "Faculty"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "AttendanceRecord" ADD CONSTRAINT "AttendanceRecord_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "AttendanceSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "AttendanceRecord" ADD CONSTRAINT "AttendanceRecord_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Poll" ADD CONSTRAINT "Poll_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Question" ADD CONSTRAINT "Question_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PollAnswer" ADD CONSTRAINT "PollAnswer_pollId_fkey" FOREIGN KEY ("pollId") REFERENCES "Poll"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PollAnswer" ADD CONSTRAINT "PollAnswer_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PollAnswer" ADD CONSTRAINT "PollAnswer_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question"("id") ON DELETE CASCADE ON UPDATE CASCADE;
