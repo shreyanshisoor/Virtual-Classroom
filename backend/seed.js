@@ -204,6 +204,12 @@ async function main() {
     console.log("\n   Section  → CS-A  (Semester 4, Computer Science)");
 }
 
-main()
-    .catch((e) => { console.error("❌ Seed failed:", e.message); process.exit(1); })
-    .finally(() => prisma.$disconnect());
+// Export for programmatic use
+module.exports = { main };
+
+// Only run if executed directly (not imported)
+if (require.main === module) {
+    main()
+        .catch((e) => { console.error("❌ Seed failed:", e.message); process.exit(1); })
+        .finally(() => prisma.$disconnect());
+}
