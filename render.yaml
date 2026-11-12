@@ -17,5 +17,5 @@ services:
 
 databases:
   - name: virtual-classroom-db
-    region: oregon
+    region: ohio
     postgresVersion: 15
