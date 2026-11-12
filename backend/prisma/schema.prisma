@@ -136,6 +136,7 @@ model Question {
   quiz     Quiz @relation(fields: [quizId], references: [id])
   quizId   Int
   pollAnswers PollAnswer[]
+  polls    Poll[] @relation("QuizPollQuestions")
 }
 
 model QuizSubmission {
