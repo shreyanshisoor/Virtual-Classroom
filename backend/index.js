@@ -1,4 +1,8 @@
-require("dotenv").config();
+// Load dotenv only in non-production environments
+// This prevents the local .env file from overriding Render's DATABASE_URL
+if (process.env.NODE_ENV !== 'production') {
+  require("dotenv").config();
+}
 const bcrypt = require("bcrypt");
 const express = require("express");
 const cors = require("cors");
