@@ -8,6 +8,12 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
+// Load dotenv only in non-production environments (local development)
+// This prevents the local .env file from overriding Render's DATABASE_URL
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 async function setupDatabase() {
   console.log('🔧 Setting up database...');
 
