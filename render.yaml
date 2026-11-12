@@ -8,7 +8,9 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: virtual-classroom-db
-          property: pgConnectionString
+          property: connectionString
+      - key: NODE_ENV
+        value: production
     autoDeploy: true
     healthCheckPath: /ws-health
     timeout: 300

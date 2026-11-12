@@ -14,6 +14,12 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+// Fall back to the individual PostgreSQL variables when no connection URL is configured.
+if (process.env.NODE_ENV === 'production' && process.env.PGHOST && !process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = `postgresql://${process.env.PGUSER}:${encodeURIComponent(process.env.PGPASSWORD || '')}@${process.env.PGHOST}:${process.env.PGPORT || 5432}/${process.env.PGDATABASE}`;
+  console.log('🔧 Constructed DATABASE_URL from PostgreSQL environment variables');
+}
+
 async function setupDatabase() {
   console.log('🔧 Setting up database...');
 
